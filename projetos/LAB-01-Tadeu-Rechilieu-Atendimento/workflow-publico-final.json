@@ -1,0 +1,784 @@
+{
+    "name":  "tadeu_rechelieu",
+    "nodes":  [
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.manualTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -384,
+                                       -32
+                                   ],
+                      "id":  "ccc4cad6-1495-4676-a39b-5f9d0a77e28c",
+                      "name":  "When clicking ‘Execute workflow’"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "0901374c-336a-4b04-9623-ec7c1f00119f",
+                                                                                     "name":  "nome",
+                                                                                     "value":  "Cliente demonstração",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "e449e6b1-c3ef-4ef7-827c-ddeaef27e911",
+                                                                                     "name":  "produto",
+                                                                                     "value":  "produto demonstração",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "66a3478b-568c-4dd6-80f9-f0b1f0928135",
+                                                                                     "name":  "tipo_solicitacao",
+                                                                                     "value":  "pagamento",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       -160,
+                                       -32
+                                   ],
+                      "id":  "a386ed60-5cc6-45d8-872b-7fcdb0f4fef3",
+                      "name":  "Edit Fields"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "eff3e0f3-9d6c-4c0e-8a1a-0481c7c43c63",
+                                                                                     "name":  "resposta",
+                                                                                     "value":  "={{ \u0027Olá, \u0027 + $json.nome + \u0027! Para solicitar um orçamento da \u0027 + $json.produto + \u0027, precisamos confirmar o modelo, o tamanho e a quantidade. Os valores serão informados após a conferência.\u0027 }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "818e87cb-b4fd-4cf2-be06-39c8e27c37e2",
+                                                                                     "name":  "",
+                                                                                     "value":  "",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       288,
+                                       -336
+                                   ],
+                      "id":  "6c5f812b-d9d4-4249-a4be-9f2e4daa90c3",
+                      "name":  "Orçamento"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "b4a430b2-aa79-4e1a-ba06-abd23b47beda",
+                                                                                     "name":  "resposta",
+                                                                                     "value":  "={{ \u0027Olá, \u0027 + $json.nome + \u0027! O prazo de encomenda da \u0027 + $json.produto + \u0027 pode chegar a 90 dias, conforme as condições do pedido. Vamos confirmar a previsão de entrega da sua peça.\u0027 }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       288,
+                                       -160
+                                   ],
+                      "id":  "23465288-c40a-4494-b01f-242bc0cdbd7a",
+                      "name":  "Prazo"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "3cee4a32-912e-4d36-b831-b4ac16db6f8f",
+                                                                                     "name":  "resposta",
+                                                                                     "value":  "={{ \u0027Olá, \u0027 + $json.nome + \u0027! Sobre o pagamento da sua encomenda de \u0027 + $json.produto + \u0027, nesta simulação as condições são 50% no pedido e 50% na entrega. Podemos confirmar os detalhes ao fechar a encomenda.\u0027 }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       288,
+                                       16
+                                   ],
+                      "id":  "533784cd-9580-4830-984b-d9616c79c864",
+                      "name":  "Pagamento"
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  false,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  4
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "leftValue":  "={{ $json.tipo_solicitacao }}",
+                                                                                                                    "rightValue":  "orcamento",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 },
+                                                                                                                    "id":  "2a2c0b44-5b65-4864-b57a-4c109eef9925"
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         },
+                                                                          "renameOutput":  true,
+                                                                          "outputKey":  "Orçamento"
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  false,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  4
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "9acc029c-6133-4b58-9d7b-cb22d2e44abc",
+                                                                                                                    "leftValue":  "={{ $json.tipo_solicitacao }}",
+                                                                                                                    "rightValue":  "prazo",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals",
+                                                                                                                                     "name":  "filter.operator.equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         },
+                                                                          "renameOutput":  true,
+                                                                          "outputKey":  "Prazo"
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  false,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  4
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "db2f980f-c7ef-4ee2-ae1e-3391d5b14cbe",
+                                                                                                                    "leftValue":  "={{ $json.tipo_solicitacao }}",
+                                                                                                                    "rightValue":  "pagamento",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals",
+                                                                                                                                     "name":  "filter.operator.equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         },
+                                                                          "renameOutput":  true,
+                                                                          "outputKey":  "Pagamento"
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "options":  {
+                                                         "fallbackOutput":  "extra",
+                                                         "ignoreCase":  true
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       64,
+                                       -144
+                                   ],
+                      "id":  "e4bd21a2-bfcc-41d5-b4a1-e3f832be2cc2",
+                      "name":  "Opções do cliente"
+                  },
+                  {
+                      "parameters":  {
+                                         "formTitle":  "Solicitação de atendimento - Tadeu Rechilieu",
+                                         "formDescription":  "Preencha os dados abaixo para consultar orçamento, prazo de encomenda ou condições de pagamento. ",
+                                         "formFields":  {
+                                                            "values":  [
+                                                                           {
+                                                                               "fieldLabel":  "Qual é o seu WhatsApp com DDD?",
+                                                                               "fieldName":  "whatsapp",
+                                                                               "placeholder":  "Digite o seu whatsapp",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Qual o produto você deseja?",
+                                                                               "fieldName":  "produto",
+                                                                               "placeholder":  "Digite o nome do seu produto",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "O que você deseja consultar?",
+                                                                               "fieldName":  "tipo_solicitacao",
+                                                                               "placeholder":  "Digite orcamento, prazo ou pagamento",
+                                                                               "requiredField":  true
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "Qual é o seu nome?",
+                                                                               "fieldName":  "nome",
+                                                                               "placeholder":  "Qual é o seu nome?",
+                                                                               "requiredField":  true
+                                                                           }
+                                                                       ]
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.formTrigger",
+                      "typeVersion":  2.6,
+                      "position":  [
+                                       -640,
+                                       -240
+                                   ],
+                      "id":  "d4c6be49-6c40-4c54-8286-739cc78cceeb",
+                      "name":  "On form submission"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "be5f2055-3206-42f3-af0b-80aa3d49f733",
+                                                                                     "name":  "tipo_solicitacao",
+                                                                                     "value":  "={{ $json.tipo_solicitacao.trim().toLowerCase().normalize(\u0027NFD\u0027).replace(/[\\u0300-\\u036f]/g, \u0027\u0027) }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "includeOtherFields":  true,
+                                         "include":  "=all",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       -432,
+                                       -240
+                                   ],
+                      "id":  "b8273c96-b375-4e66-b847-05c8514fa65b",
+                      "name":  "Tratamento de dados"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "61a38802-1fdd-4797-9d69-db481bf7e8d8",
+                                                                                     "name":  "resposta",
+                                                                                     "value":  "Olá! Não consegui identificar sua solicitação. Por favor, informe se deseja consultar orçamento, prazo de encomenda ou condições de pagamento. Se precisar de outra informação, nossa equipe poderá orientar você.",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       288,
+                                       192
+                                   ],
+                      "id":  "9d8f5d74-1b0c-493a-8a90-a33a472dc536",
+                      "name":  "Solicitação não reconhecida"
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  4
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "195ef427-09c4-4b87-822a-1914f419476a",
+                                                                                   "leftValue":  "={{ ($json.nome || \"\").trim().replace(/[^\\p{L}\\p{M} ]/gu, \"\").trim().length }}",
+                                                                                   "rightValue":  0,
+                                                                                   "operator":  {
+                                                                                                    "type":  "number",
+                                                                                                    "operation":  "gt"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.4,
+                      "position":  [
+                                       -256,
+                                       -240
+                                   ],
+                      "id":  "ec5f2537-41d3-43e9-9ba3-ae01de6ed420",
+                      "name":  "If"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "bc66362d-d481-4a26-8faa-fec9d915fd52",
+                                                                                     "name":  "Resposta - Nome - inválido",
+                                                                                     "value":  "Não conseguimos identificar um nome válido. Por favor, informe seu nome utilizando letras para continuar com sua solicitação. 😊",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       64,
+                                       128
+                                   ],
+                      "id":  "96f251ac-7b9c-4909-befc-f53244814c24",
+                      "name":  "Msg nome inválido"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "DOCUMENT_ID_EXEMPLO",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "Planilha de demonstração",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/SEU_DOCUMENT_ID_AQUI"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Página1",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/SEU_DOCUMENT_ID_AQUI"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "autoMapInputData",
+                                                         "value":  {
+
+                                                                   },
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "data_solicitacao",
+                                                                            "displayName":  "data_solicitacao",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "protocolo",
+                                                                            "displayName":  "protocolo",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "nome",
+                                                                            "displayName":  "nome",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "produto",
+                                                                            "displayName":  "produto",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "tipo_solicitacao",
+                                                                            "displayName":  "tipo_solicitacao",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "status",
+                                                                            "displayName":  "status",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "whatsapp",
+                                                                            "displayName":  "whatsapp",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       -240,
+                                       -416
+                                   ],
+                      "id":  "72f1666d-5cc4-45ad-a98c-3e546f6e37cb",
+                      "name":  "Append row in sheet"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "c2928911-90fe-43ad-b9f1-a9091c3723ce",
+                                                                                     "name":  "data_solicitacao",
+                                                                                     "value":  "={{ $now.toISO() }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "3715e9e5-d079-4036-b49e-6a3025ccbaa6",
+                                                                                     "name":  "nome",
+                                                                                     "value":  "= {{ $json.nome }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "9258ad85-d33f-4466-b54f-51738f669649",
+                                                                                     "name":  "produto",
+                                                                                     "value":  "={{ $json.produto }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "78e34278-2d8c-4ea4-b31e-af27c95a0c4e",
+                                                                                     "name":  "tipo_solicitacao",
+                                                                                     "value":  "={{ $json.tipo_solicitacao }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "eac25d76-c627-4e58-86d0-e4300eaef364",
+                                                                                     "name":  "status",
+                                                                                     "value":  "Recebido",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "095c66a9-a002-4c3e-a84b-8033a00daf91",
+                                                                                     "name":  "protocolo",
+                                                                                     "value":  "={{ \u0027TR-\u0027 + $execution.id }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "664ca38b-d83d-4b5f-81be-ff335f636a2c",
+                                                                                     "name":  "whatsapp",
+                                                                                     "value":  "=  {{ $json.whatsapp }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.5,
+                      "position":  [
+                                       -448,
+                                       -416
+                                   ],
+                      "id":  "04321e5b-3e9a-4cc8-8580-0851d2ece590",
+                      "name":  "preparar dados da planilha"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.resend.com/emails",
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Authorization",
+                                                                                         "value":  "Bearer SUA CHAVE REMOVIDA"
+                                                                                     },
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{\n  {\n    from: \"onboarding@resend.dev\",\n    to: [\"contato@exemplo.com\"],\n    subject: \"Nova solicitação recebida - Tadeu Rechilieu\",\n    html: `\u003ch2\u003eNova solicitação recebida!\u003c/h2\u003e\n      \u003cp\u003e\u003cstrong\u003eCliente:\u003c/strong\u003e ${$json.nome || $json.Nome || \"Não informado\"}\u003c/p\u003e\n      \u003cp\u003e\u003cstrong\u003eWhatsApp:\u003c/strong\u003e ${$json.whatsapp || \"Não informado\"}\u003c/p\u003e\n      \u003cp\u003e\u003cstrong\u003eProduto:\u003c/strong\u003e ${$json.produto || \"Não informado\"}\u003c/p\u003e\n      \u003cp\u003e\u003cstrong\u003eTipo de solicitação:\u003c/strong\u003e ${$json.tipo_solicitacao || \"Não informado\"}\u003c/p\u003e\n      \u003cp\u003eConsulte a planilha de controle para acompanhar o atendimento.\u003c/p\u003e`\n  }\n}}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.5,
+                      "position":  [
+                                       -32,
+                                       -512
+                                   ],
+                      "id":  "09e52e99-eb62-4bd0-8588-b7be5ac40b31",
+                      "name":  "Envio da solicitação para a empresa"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "completion",
+                                         "completionTitle":  "Solicitação recebida",
+                                         "completionMessage":  "={{ $json.resposta }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.form",
+                      "typeVersion":  2.5,
+                      "position":  [
+                                       544,
+                                       -336
+                                   ],
+                      "id":  "66aa83b7-a372-4d46-8b1b-9fdeedd20f02",
+                      "name":  "Fim da forma"
+                  }
+              ],
+    "connections":  {
+                        "When clicking ‘Execute workflow’":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Edit Fields",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Opções do cliente",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Opções do cliente":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Orçamento",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ],
+                                                               [
+                                                                   {
+                                                                       "node":  "Prazo",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ],
+                                                               [
+                                                                   {
+                                                                       "node":  "Pagamento",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ],
+                                                               [
+                                                                   {
+                                                                       "node":  "Solicitação não reconhecida",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "On form submission":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Tratamento de dados",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Tratamento de dados":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "If",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "If":  {
+                                   "main":  [
+                                                [
+                                                    {
+                                                        "node":  "Opções do cliente",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    },
+                                                    {
+                                                        "node":  "preparar dados da planilha",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    }
+                                                ],
+                                                [
+                                                    {
+                                                        "node":  "Msg nome inválido",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    }
+                                                ]
+                                            ]
+                               },
+                        "preparar dados da planilha":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Append row in sheet",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            },
+                                                                            {
+                                                                                "node":  "Envio da solicitação para a empresa",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "Orçamento":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Fim da forma",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Prazo":  {
+                                      "main":  [
+                                                   [
+                                                       {
+                                                           "node":  "Fim da forma",
+                                                           "type":  "main",
+                                                           "index":  0
+                                                       }
+                                                   ]
+                                               ]
+                                  },
+                        "Pagamento":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Fim da forma",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Solicitação não reconhecida":  {
+                                                            "main":  [
+                                                                         [
+                                                                             {
+                                                                                 "node":  "Fim da forma",
+                                                                                 "type":  "main",
+                                                                                 "index":  0
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                        }
+                    },
+    "active":  false,
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate"
+                 },
+    "nodeGroups":  [
+
+                   ],
+    "tags":  [
+
+             ]
+}
