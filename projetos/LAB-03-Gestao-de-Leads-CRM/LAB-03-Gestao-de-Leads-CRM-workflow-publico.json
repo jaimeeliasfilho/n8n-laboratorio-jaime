@@ -1,0 +1,294 @@
+{
+  "name": "LAB 03 - Gestão de Leads e CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Cadastro de Potenciais Clientes",
+        "formDescription": "Preencha seus dados por formulário para que nossa equipe entre em contato e conheça melhor sua necessidade.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nome completo",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "E-mail",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Telefone",
+              "placeholder": "(11) 99999-9999",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Empresa",
+              "placeholder": "Nome da Empresa (se disponível)"
+            },
+            {
+              "fieldLabel": "Qual produto ou serviço você procura? ",
+              "fieldType": "textarea",
+              "placeholder": "Descreva brevemente o que você precisa.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Como conheceu nossa empresa?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Instagram"
+                  },
+                  {
+                    "option": "Facebook"
+                  },
+                  {
+                    "option": "Google"
+                  },
+                  {
+                    "option": "Indicação"
+                  },
+                  {
+                    "option": "Whatsapp"
+                  },
+                  {
+                    "option": "Outros"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Observações adicionais",
+              "fieldType": "textarea",
+              "placeholder": "Existe alguma informação adicional que gostaria de compartilhar?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "106f5c0e-932e-44d7-9402-ac98ffde77c7",
+      "name": "On form submission"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dea7bcf8-3fb4-4ed9-b252-a75b21e9463b",
+              "name": "nome",
+              "value": "={{ $json[\"Nome completo\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "b4f98402-474c-483e-9664-ba12a0904546",
+              "name": "email",
+              "value": "={{ $json[\"E-mail\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "eeabab2d-1dfe-4dea-9134-7b7c5a484c82",
+              "name": "telefone",
+              "value": "={{ $json[\"Telefone\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "5e184d1e-32a8-407f-86ac-89c389f24f88",
+              "name": "empresa",
+              "value": "={{ $json[\"Empresa\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "bd2c9ce6-d056-4331-998e-52c614a2b0b9",
+              "name": "interesse",
+              "value": "={{ $json[\"Qual produto ou serviço você procura? \"] }}",
+              "type": "string"
+            },
+            {
+              "id": "0f45d60c-1bfd-40f1-bf28-96886cdf1ff4",
+              "name": "origem",
+              "value": "={{ $json[\"Como conheceu nossa empresa?\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "9d4eb2f1-73de-4867-b283-f311eebe1591",
+              "name": "observacoes",
+              "value": "={{ $json[\"Observações adicionais\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "7a1ebf0c-6682-41ac-a33a-d35c0e868336",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": "Selecione sua própria planilha Google Sheets"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "data_cadastro": "={{ $now.toISO() }}",
+            "nome": "={{ $json.nome }}",
+            "email": "={{ $json.email }}",
+            "telefone": "={{ $json.telefone }}",
+            "empresa": "={{ $json.empresa }}",
+            "interesse": "={{ $json.interesse }}",
+            "origem": "={{ $json.origem }}",
+            "observacoes": "={{ $json.observacoes }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data_cadastro",
+              "displayName": "data_cadastro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "empresa",
+              "displayName": "empresa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "interesse",
+              "displayName": "interesse",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "origem",
+              "displayName": "origem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "observacoes",
+              "displayName": "observacoes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        0
+      ],
+      "id": "6d7b9566-c315-4cb2-85bb-fa5202cc7319",
+      "name": "Append row in sheet"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "tags": []
+}
