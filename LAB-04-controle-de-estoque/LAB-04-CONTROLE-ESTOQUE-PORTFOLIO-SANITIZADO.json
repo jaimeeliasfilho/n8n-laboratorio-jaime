@@ -1,0 +1,858 @@
+{
+  "name": "LAB 04 - Controle de Estoque e Reposição (PORTFÓLIO)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        0
+      ],
+      "id": "0ab95c88-a7f9-4fc3-8982-483b7a759c51",
+      "name": "01 - Iniciar teste"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c42a7422-2f66-46e3-bd51-ed8fddbeb8e6",
+              "name": "produto",
+              "value": "Camiseta branca",
+              "type": "string"
+            },
+            {
+              "id": "5cfb12c5-8d71-45f0-9ad3-23607b02059b",
+              "name": "codigo",
+              "value": "CAM001",
+              "type": "string"
+            },
+            {
+              "id": "d175abf4-e599-4c7c-921a-0c48cac5e54a",
+              "name": "quantidade",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "5c596d78-6bf8-41ea-9596-fadf18cf727f",
+              "name": "tipo_movimentacao",
+              "value": "SAIDA",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "a2756ea1-2f8f-42d7-894e-cd3426773a63",
+      "name": "02 - Dados da movimentação"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ba3b0075-b70f-4f03-bfdf-8815743b0e6a",
+              "name": "novo_estoque",
+              "value": "={{\n  $json.tipo_movimentacao.toString().trim().toUpperCase() === 'ENTRADA'\n    ? Number($json.estoque_atual) + Number($json.quantidade)\n    : Number($json.estoque_atual) - Number($json.quantidade)\n}}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        0
+      ],
+      "id": "16aa16f9-69f1-4a3d-b6bc-d967a2b28aee",
+      "name": "03 - Calcular novo estoque"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "514fe2ad-3290-4ae5-bf9a-dc1ec97d5c9d",
+              "leftValue": "={{ $json.novo_estoque }}",
+              "rightValue": "={{ $json.estoque_minimo }}",
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        896,
+        0
+      ],
+      "id": "333165dc-94d7-4ebf-88cd-d33a76f91c1a",
+      "name": "04 - Verificar estoque mínimo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ab46291-ca43-48d0-b9ff-b9d64fec632c",
+              "name": "alerta_estoque",
+              "value": "Estoque no limite mínimo! Necessário programar reposição.",
+              "type": "string"
+            },
+            {
+              "id": "10dda83f-e939-4482-90d4-60a44f6e8678",
+              "name": "status_estoque",
+              "value": "REPOSICAO_NECESSARIA",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1120,
+        -96
+      ],
+      "id": "5ca18e20-3bd2-441f-838c-9d70cfc7229b",
+      "name": "05A - Gerar alerta de reposição"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a38af3f-1bf9-47fa-83ad-1f15356d0dbc",
+              "name": "status_estoque",
+              "value": "ESTOQUE_NORMAL",
+              "type": "string"
+            },
+            {
+              "id": "e811687c-e611-437c-bd3e-f0923a16e99d",
+              "name": "alerta_estoque",
+              "value": "Estoque dentro do nível adequado.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1120,
+        96
+      ],
+      "id": "749bf766-508d-4392-862b-7d93caeba465",
+      "name": "05B - Status estoque normal"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "DOCUMENT_ID_SANITIZADO",
+          "mode": "list",
+          "cachedResultName": "LAB 04 - Controle de Estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DOCUMENT_ID_SANITIZADO/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DOCUMENT_ID_SANITIZADO/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "data_movimentacao": "={{ $now.setZone('America/Sao_Paulo').toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "produto": "={{ $json.produto }}",
+            "codigo": "={{ $json.codigo }}",
+            "tipo_movimentacao": "={{ $json.tipo_movimentacao }}",
+            "quantidade": "={{ $json.quantidade }}",
+            "estoque_minimo": "={{ $json.estoque_minimo }}",
+            "novo_estoque": "={{ $json.novo_estoque }}",
+            "status_estoque": "={{ $json.status_estoque }}",
+            "alerta_estoque": "={{ $json.alerta_estoque }}",
+            "estoque_anterior": "={{ $json.estoque_atual }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "data_movimentacao",
+              "displayName": "data_movimentacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "produto",
+              "displayName": "produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "codigo",
+              "displayName": "codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo_movimentacao",
+              "displayName": "tipo_movimentacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "quantidade",
+              "displayName": "quantidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estoque_anterior",
+              "displayName": "estoque_anterior",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "novo_estoque",
+              "displayName": "novo_estoque",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estoque_minimo",
+              "displayName": "estoque_minimo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_estoque",
+              "displayName": "status_estoque",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alerta_estoque",
+              "displayName": "alerta_estoque",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1408,
+        -48
+      ],
+      "id": "f237579e-28eb-441a-b086-f420a0ea69df",
+      "name": "06 - Registra movimentação",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CREDENTIAL_ID_SANITIZADO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "c96e9347-a564-48ce-97a8-32382ade6fe7",
+              "leftValue": "={{ $json.tipo_movimentacao.toString().trim().toUpperCase() }}",
+              "rightValue": "SAIDA",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "5c44c24b-e9d5-4d0d-9f60-b3ab3da8f0d5",
+              "leftValue": "={{ $json.quantidade }}",
+              "rightValue": "={{ $json.estoque_atual }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "55e9a492-0165-4c49-bb79-cfbbec5caf67",
+      "name": "02A - Validar saldo saída"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f343a302-299b-49fa-a7e3-4dc9d0457d2e",
+              "name": "status_estoque",
+              "value": "MOVIMENTACAO_BLOQUEADA",
+              "type": "string"
+            },
+            {
+              "id": "644f079f-1369-48dd-8fee-73d41ff97137",
+              "name": "alerta_estoque",
+              "value": "ERRO: Quantidade solicitada superior ao estoque disponível.",
+              "type": "string"
+            },
+            {
+              "id": "d0820e45-0596-4447-80d1-e1fd348668c0",
+              "name": "novo_estoque",
+              "value": "={{ $json.estoque_atual }}",
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        608,
+        -160
+      ],
+      "id": "ff61f288-46f5-4508-b095-090747980c54",
+      "name": "02B - Bloquear saída sem saldo"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "DOCUMENT_ID_SANITIZADO",
+          "mode": "list",
+          "cachedResultName": "LAB 04 - Controle de Estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DOCUMENT_ID_SANITIZADO/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847812263,
+          "mode": "list",
+          "cachedResultName": "Estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DOCUMENT_ID_SANITIZADO/edit#gid=1847812263"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "codigo",
+              "lookupValue": "={{ $json.codigo }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        48,
+        0
+      ],
+      "id": "1fb0afb4-19ec-4c50-b3d9-763352fbfd8e",
+      "name": "01A - Consultar saldo do produto",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CREDENTIAL_ID_SANITIZADO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        256,
+        -112
+      ],
+      "id": "34325e66-91a6-4720-8510-205a08739969",
+      "name": "01B - Unir e movimentar saldo"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "DOCUMENT_ID_SANITIZADO",
+          "mode": "list",
+          "cachedResultName": "LAB 04 - Controle de Estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DOCUMENT_ID_SANITIZADO/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1847812263,
+          "mode": "list",
+          "cachedResultName": "Estoque",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/DOCUMENT_ID_SANITIZADO/edit#gid=1847812263"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "codigo": "={{ $json.codigo }}",
+            "produto": "={{ $json.produto }}",
+            "estoque_minimo": "={{ $json.estoque_minimo }}",
+            "estoque_atual": "={{ $json.novo_estoque }}"
+          },
+          "matchingColumns": [
+            "codigo"
+          ],
+          "schema": [
+            {
+              "id": "codigo",
+              "displayName": "codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "produto",
+              "displayName": "produto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estoque_atual",
+              "displayName": "estoque_atual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "estoque_minimo",
+              "displayName": "estoque_minimo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1216,
+        -288
+      ],
+      "id": "cc973c7b-1e4f-4b4a-882c-6c42fd7929ed",
+      "name": "06A - Atualizar saldo do estoque",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CREDENTIAL_ID_SANITIZADO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "a2abd5ec-7427-40b3-993e-d3aa7b14cadd",
+              "leftValue": "={{ $json.codigo }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        256,
+        -272
+      ],
+      "id": "3c0eb1a3-6499-499d-9b73-42b244838089",
+      "name": "01C - Verificar produto cadastrado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5f41151f-8aad-405f-8345-396f3593cb4f",
+              "name": "status_estoque",
+              "value": "PRODUTO_NAO_CADASTRADO",
+              "type": "string"
+            },
+            {
+              "id": "104849f0-f90e-4056-9a82-5b948c1f25c3",
+              "name": "alerta_estoque",
+              "value": "ERRO: Código de produto não encontrado no cadastro de estoque",
+              "type": "string"
+            },
+            {
+              "id": "c3124dbe-b602-4775-b846-ca863b19eb7b",
+              "name": "novo_estoque",
+              "value": "0",
+              "type": "string"
+            },
+            {
+              "id": "645929aa-86aa-485d-8a6a-fddb3eb56669",
+              "name": "codigo",
+              "value": "={{ $('02 - Dados da movimentação').item.json.codigo }}",
+              "type": "string"
+            },
+            {
+              "id": "9ec5d149-72d6-4d1a-8f11-7d3a180d9ada",
+              "name": "produto",
+              "value": "={{ $('02 - Dados da movimentação').item.json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "6fed758e-f57a-46a7-bf89-a831ac2763a2",
+              "name": "tipo_movimentacao",
+              "value": "={{ $('02 - Dados da movimentação').item.json.tipo_movimentacao }}",
+              "type": "string"
+            },
+            {
+              "id": "a2eec788-d544-4b38-b340-02f93fd121b5",
+              "name": "quantidade",
+              "value": "={{ $('02 - Dados da movimentação').item.json.quantidade }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        528,
+        -384
+      ],
+      "id": "1fac17bc-ad3e-46c9-8c21-33d2266eb058",
+      "name": "01D - Bloquear produto não cadastrado"
+    },
+    {
+      "parameters": {
+        "chatId": "CHAT_ID_SANITIZADO",
+        "text": "={{ '⚠️ ALERTA DE REPOSIÇÃO\\n\\n' + 'Produto: ' + $json.produto + '\\n' + 'Código: ' + $json.codigo + '\\n' + 'Estoque atual: ' + $json.novo_estoque + '\\n' + 'Estoque mínimo: ' + $json.estoque_minimo + '\\n\\n' + 'Necessário programar reposição!' }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1664,
+        -48
+      ],
+      "id": "a232cfd6-2c84-4adf-9ee8-2287661f5361",
+      "name": "07 - Enviar alerta de reposição",
+      "webhookId": "WEBHOOK_ID_SANITIZADO",
+      "credentials": {
+        "telegramApi": {
+          "id": "CREDENTIAL_ID_SANITIZADO",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "01 - Iniciar teste": {
+      "main": [
+        [
+          {
+            "node": "02 - Dados da movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Dados da movimentação": {
+      "main": [
+        [
+          {
+            "node": "01A - Consultar saldo do produto",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "01B - Unir e movimentar saldo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Calcular novo estoque": {
+      "main": [
+        [
+          {
+            "node": "04 - Verificar estoque mínimo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Verificar estoque mínimo": {
+      "main": [
+        [
+          {
+            "node": "05A - Gerar alerta de reposição",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "05B - Status estoque normal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05A - Gerar alerta de reposição": {
+      "main": [
+        [
+          {
+            "node": "06A - Atualizar saldo do estoque",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "07 - Enviar alerta de reposição",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05B - Status estoque normal": {
+      "main": [
+        [
+          {
+            "node": "06A - Atualizar saldo do estoque",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02A -  Validar saldo saída": {
+      "main": [
+        [
+          {
+            "node": "02B - Bloquear saída sem saldo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "03 - Calcular novo estoque",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02B - Bloquear saída sem saldo": {
+      "main": [
+        [
+          {
+            "node": "06 - Registra movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01A - Consultar saldo do produto": {
+      "main": [
+        [
+          {
+            "node": "01C - Verificar produto cadastrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01B - Unir e movimentar saldo": {
+      "main": [
+        [
+          {
+            "node": "02A -  Validar saldo saída",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06A - Atualizar saldo do estoque": {
+      "main": [
+        [
+          {
+            "node": "06 - Registra movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01C - Verificar produto cadastrado": {
+      "main": [
+        [
+          {
+            "node": "01B - Unir e movimentar saldo",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "01D - Bloquear produto não cadastrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01D - Bloquear produto não cadastrado": {
+      "main": [
+        [
+          {
+            "node": "06 - Registra movimentação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "VERSION_ID_SANITIZADO",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "INSTANCE_ID_SANITIZADO"
+  },
+  "nodeGroups": [],
+  "id": "WORKFLOW_ID_SANITIZADO",
+  "tags": []
+}
