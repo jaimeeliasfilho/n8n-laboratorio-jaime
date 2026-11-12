@@ -1,0 +1,473 @@
+{
+  "name": "LAB 05 - Agente de IA para Triagem de Atendimento - Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "15f9203a-24f4-427a-a1ee-8072b60d75cd",
+              "name": "mensagem_cliente",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "58ae5b58-b670-43e5-9f17-6f52d8e0b2d9",
+              "name": "data_recebimento",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "0a6a8ef0-c6c3-4c48-b05d-9adca81b4a39",
+              "name": "name",
+              "value": "={{ $json.message.from.first_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -528,
+        80
+      ],
+      "id": "ccb3083b-3da1-45b7-82c5-876492b8818d",
+      "name": "02 - Preparar dados"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.mensagem_cliente }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "ORCAMENTO",
+              "description": "dúvidas sobre preços, valores e solicitações de orçamento."
+            },
+            {
+              "category": "PEDIDO",
+              "description": "realização, alteração ou consulta de pedidos."
+            },
+            {
+              "category": "PRAZO",
+              "description": "dúvidas sobre tempo de produção, previsão de conclusão do pedido e previsão de recebimento ou entrega. Não utilizar para perguntas sobre cidades, estados ou regiões atendidas."
+            },
+            {
+              "category": "PAGAMENTO",
+              "description": "dúvidas sobre pagamentos, parcelas e comprovantes."
+            },
+            {
+              "category": "RECLAMACAO",
+              "description": "insatisfações, problemas ou reclamações."
+            },
+            {
+              "category": "ATENDIMENTO_HUMANO",
+              "description": "pedidos para falar com uma pessoa."
+            },
+            {
+              "category": "OUTROS",
+              "description": "perguntas sobre regiões, cidades e estados atendidos, locais de entrega e assuntos gerais que não se encaixam nas demais categorias."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "649054f4-c386-45c4-9df7-efc11d413123",
+      "name": "03 - Cassifificar solicitação com IA"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -304,
+        336
+      ],
+      "id": "0f548091-68c6-4bcc-bd5a-4e826a0b53a9",
+      "name": "04 - Modelo Gemini"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b94f23c-843b-4683-a8f9-b2932a36c9e5",
+              "name": "reposta",
+              "value": "Obrigado pelo seu interesse! 😊  Recebemos sua solicitação de orçamento. Vamos encaminhá-la para confirmação de valores e disponibilidade. Em breve, nossa equipe retornará com as informações.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -384
+      ],
+      "id": "73a576dc-e783-4af2-a5f5-74c883789e3a",
+      "name": "05 - Preparar resposta orçamento"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a34cd238-b97f-42cc-ac84-279b50ad4a0b",
+              "name": "resposta",
+              "value": "Olá! 😊 Recebemos sua solicitação sobre o pedido.  Para que nossa equipe possa ajudar, informe o número do pedido ou o nome utilizado na solicitação. Vamos verificar as informações e retornar com uma atualização.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -192
+      ],
+      "id": "37f1f387-1825-45f8-b676-066409729114",
+      "name": "06 - Preparar resposta do pedido"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0d58bcff-c7dc-45c4-bbbe-1f3142f0ca78",
+              "name": "resposta",
+              "value": "Olá! 😊 Obrigado pelo seu contato.  O prazo de produção e entrega pode variar conforme o produto e os detalhes do pedido.  Para informar uma previsão correta, nossa equipe precisa consultar as condições do seu pedido. Em breve, retornaremos com essa informação!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -48
+      ],
+      "id": "e06f6565-8cc3-4fbd-b3b4-c812d6909caa",
+      "name": "07 - Preparar resposta de prazo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "80c026e9-10c3-4afa-833a-bc51ee1e0e79",
+              "name": "resposta",
+              "value": "Olá! 😊 Obrigado pelo contato.  As condições de pagamento, incluindo opções de parcelamento, são confirmadas no momento da negociação do pedido.  Nossa equipe poderá informar as opções disponíveis e esclarecer suas dúvidas.  Estamos à disposição!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        112
+      ],
+      "id": "b23a141f-59ce-45fb-8008-7849e185cc8c",
+      "name": "08 - Preparar resposta de pagamento"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6908593-480d-4b17-8bdd-fd834ddd53b6",
+              "name": "resposta",
+              "value": "Olá! Sentimos muito que sua experiência não tenha sido como esperava. ❤️  Agradecemos por nos informar sobre o ocorrido. Sua reclamação é importante para nós e será encaminhada à nossa equipe para análise.  Se possível, conte um pouco mais sobre o problema e informe o número do pedido para facilitar a identificação.  Vamos fazer o possível para ajudar!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        240
+      ],
+      "id": "8224f732-43b6-471f-9ea7-551873d7661b",
+      "name": "09 - Preparar resposta de reclamação"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43e863e1-3e73-4929-be63-26dcd7ab39e8",
+              "name": "resposta",
+              "value": "Olá! 😊 Claro, será um prazer ajudar você.  Entendemos que prefere conversar diretamente com uma pessoa da nossa equipe.  Sua solicitação será encaminhada para atendimento humano. Assim que possível, nossa equipe dará continuidade à conversa.  Obrigado pela preferência! ❤️",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        256,
+        272
+      ],
+      "id": "35441bb4-bbf7-4e19-b018-f6eec023a36d",
+      "name": "10 - Preparar resposta de atendimento humano"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0fe891c5-eb80-4964-9bb2-3110ad957cbb",
+              "name": "resposta",
+              "value": "Olá! 😊 Obrigado por entrar em contato.  Não consegui identificar exatamente sua solicitação, mas quero ajudar!  Você poderia explicar um pouquinho melhor o que precisa? Assim, podemos direcionar sua mensagem para a pessoa certa da nossa equipe.  Estamos à disposição! ❤️",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        464,
+        368
+      ],
+      "id": "e31ca15f-1fee-4a6a-ac66-a035aa65f1c6",
+      "name": "11 - Preparar resposta para outros assuntos"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('01A - Cliente entra em contato').item.json.message.chat.id }}",
+        "text": "={{ $json.resposta || $json.reposta }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        -240
+      ],
+      "id": "7e1f3329-623d-46cf-bae8-3287db45bec1",
+      "name": "12 - Envia mensagem para o cliente"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -864,
+        80
+      ],
+      "id": "5b525db1-077a-4f58-8cdd-ca65031ad931",
+      "name": "01A - Cliente entra em contato"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "02 - Preparar dados": {
+      "main": [
+        [
+          {
+            "node": "03 - Cassifificar solicitação com IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Modelo Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "03 - Cassifificar solicitação com IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Cassifificar solicitação com IA": {
+      "main": [
+        [
+          {
+            "node": "05 - Preparar resposta orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "06 - Preparar resposta do pedido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "07 - Preparar resposta de prazo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "08 - Preparar resposta de pagamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "09 - Preparar resposta de reclamação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "10 - Preparar resposta de atendimento humano",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "11 - Preparar resposta para outros assuntos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Preparar resposta orçamento": {
+      "main": [
+        [
+          {
+            "node": "12 - Envia mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Preparar resposta do pedido": {
+      "main": [
+        [
+          {
+            "node": "12 - Envia mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07 - Preparar resposta de prazo": {
+      "main": [
+        [
+          {
+            "node": "12 - Envia mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08 - Preparar resposta de pagamento": {
+      "main": [
+        [
+          {
+            "node": "12 - Envia mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10 - Preparar resposta de atendimento humano": {
+      "main": [
+        [
+          {
+            "node": "12 - Envia mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11 - Preparar resposta para outros assuntos": {
+      "main": [
+        [
+          {
+            "node": "12 - Envia mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09 - Preparar resposta de reclamação": {
+      "main": [
+        [
+          {
+            "node": "12 - Envia mensagem para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01A - Cliente entra em contato": {
+      "main": [
+        [
+          {
+            "node": "02 - Preparar dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
