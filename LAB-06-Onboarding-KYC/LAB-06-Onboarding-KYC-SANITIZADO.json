@@ -1,0 +1,640 @@
+{
+  "name": "LAB 06 - Automação de Onboarding KYC com IA e Validação de CNPJ",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Cadastro de Empresa - Onboarding KYC",
+        "formDescription": "Preencha os dados da empresa para iniciar o processo de validação cadastral.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Razão Social",
+              "placeholder": "Digite a razão social da empresa",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Nome Fantasia",
+              "placeholder": "Digite o nome fantasia da empresa",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "CNPJ",
+              "placeholder": "Digite o CNPJ da empresa (somente números)",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "E-mail corporativo",
+              "fieldType": "email",
+              "placeholder": "Digite o e-mail corporativo.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Telefone corporativo",
+              "placeholder": "Digite o telefone com DDD",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Nome do responsável",
+              "placeholder": "Digite o nome completo do responsável pela empresa",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "CPF do responsável",
+              "placeholder": "Digite o CPF somente com números",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Atividade principal da empresa",
+              "fieldType": "textarea",
+              "placeholder": "Descreva brevemente a atividade principal da empresa.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Endereço comercial",
+              "fieldType": "textarea",
+              "placeholder": "Informe rua, número, bairro, cidade e estado.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Consentimento para tratamento de dados",
+              "fieldType": "checkbox",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Autorizo o uso dos dados para fins de cadastro e análise cadastral. "
+                  }
+                ]
+              },
+              "requiredField": "={{ true }}"
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Cadastro recebido com sucesso!  As informações da empresa foram encaminhadas para validação cadastral. Nossa equipe poderá entrar em contato caso sejam necessários esclarecimentos adicionais."
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "9751ced5-a05f-46d0-9a75-dd03516bd73d",
+      "name": "01 - Receber cadastro da empresa",
+      "webhookId": "WEBHOOK_ID_SANITIZADO_01_-_RECEBER_CADASTRO_DA_EMPRESA"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://brasilapi.com.br/api/cnpj/v1/' + $json.cnpj_normalizado }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        352,
+        0
+      ],
+      "id": "e008bb32-afff-4680-8645-44e01a8d7ee4",
+      "name": "02 - Consultar CNPJ da Brasil API",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab971e45-9deb-4926-b65e-2251d114d394",
+              "name": "razao_social",
+              "value": "={{ $json.razao_social }}",
+              "type": "string"
+            },
+            {
+              "id": "421182c4-ebeb-40c6-a8cd-8f1cc746ca49",
+              "name": "nome_fantasia",
+              "value": "={{ $json.nome_fantasia }}",
+              "type": "string"
+            },
+            {
+              "id": "b0477b9d-5056-41ef-b916-b70e442c9267",
+              "name": "cnpj",
+              "value": "={{ $json.cnpj }}",
+              "type": "string"
+            },
+            {
+              "id": "02d995ff-f369-46d2-8579-b3c7bfc51d0d",
+              "name": "situacao_cadastral",
+              "value": "={{ $json.situacao_cadastral }}",
+              "type": "number"
+            },
+            {
+              "id": "445ec4c8-2dc3-4224-9b75-135f97ea5f11",
+              "name": "municipio",
+              "value": "={{ $json.municipio }}",
+              "type": "string"
+            },
+            {
+              "id": "5a091977-7139-4212-a691-ff350b82d5f2",
+              "name": "uf",
+              "value": "={{ $json.uf }}",
+              "type": "string"
+            },
+            {
+              "id": "779c01fa-95d5-4d07-a8bf-6a8b4c7f2919",
+              "name": "porte",
+              "value": "={{ $json.porte }}",
+              "type": "string"
+            },
+            {
+              "id": "6f689984-bf6f-4657-a714-f1c0172d058d",
+              "name": "cnae_fiscal",
+              "value": "={{ $json.cnae_fiscal }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        528,
+        0
+      ],
+      "id": "026c21bd-b021-412c-a1d8-4a6a25eb50af",
+      "name": "03 - Organizar dados cadastrais"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "9002b172-2273-4227-8f43-4cb2b46daf5a",
+              "leftValue": "={{ $json.situacao_cadastral }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        736,
+        0
+      ],
+      "id": "44d2228c-b78b-4a6b-ab45-28b74057b98b",
+      "name": "04 - Verificar Situação cadastral"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7274ea6d-dffd-4e67-9204-39de6ed72786",
+              "name": "status_kyc",
+              "value": "EM_ANALISE",
+              "type": "string"
+            },
+            {
+              "id": "87c375f1-99ce-4a4a-ab97-3075ecb4c0fe",
+              "name": "motivo_status",
+              "value": "Empresa com situação cadastral ATIVA na Receita Federal.",
+              "type": "string"
+            },
+            {
+              "id": "29e3a472-f2a6-4f6a-8dc6-8c31faec76b3",
+              "name": "mensagem_retorno",
+              "value": "Cadastro recebido. A empresa seguirá para análise complementar de KYC.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        928,
+        -80
+      ],
+      "id": "069cfb2f-45d5-4ea5-b5d9-1cc55e1876f6",
+      "name": "06 - Preparar análise KYC de empresa ativa"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d0d4f810-e6ed-4271-83ae-efb25722f6f0",
+              "name": "status_kyc",
+              "value": "PENDENTE_REVISAO",
+              "type": "string"
+            },
+            {
+              "id": "65944af5-12d8-465b-87e1-e92b8f685a76",
+              "name": "motivo_pendencia",
+              "value": "Empresa com situação cadastral diferente de ATIVA na Receita Federal.",
+              "type": "string"
+            },
+            {
+              "id": "19a9b1a4-95e3-47c2-bc83-ee51588ef4e2",
+              "name": "mensagem_retorno",
+              "value": "Cadastro recebido, mas a situação cadastral exige análise complementar da equipe.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        944,
+        64
+      ],
+      "id": "b706a722-fb43-4050-a7eb-c6b5e3b436b6",
+      "name": "05 - registrar pendência cadastral"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "96715aa9-1f03-4189-8e53-de6d32acb286",
+              "name": "empresa",
+              "value": "={{ $json.razao_social }}",
+              "type": "string"
+            },
+            {
+              "id": "f5d6b8fc-ea5d-4e67-83c9-f09b3126d3a8",
+              "name": "cnpj",
+              "value": "={{ $json.cnpj }}",
+              "type": "string"
+            },
+            {
+              "id": "7aca07c1-f52b-46ef-83cf-bd9437f63ed0",
+              "name": "situacao_cadastral",
+              "value": "={{ $json.situacao_cadastral }}",
+              "type": "number"
+            },
+            {
+              "id": "8743522d-f0d6-4e08-a7bc-943a871738cc",
+              "name": "status_kyc",
+              "value": "={{ $json.status_kyc }}",
+              "type": "string"
+            },
+            {
+              "id": "61a08e18-9cac-4f43-9fa8-366a1f995a0d",
+              "name": "parecer_final",
+              "value": "={{ $json.mensagem_retorno }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1360,
+        0
+      ],
+      "id": "f716abec-3fc5-449e-9c9c-b33d96038450",
+      "name": "08 - Preparar resumo para equipe KYC"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9985646-17bd-48ff-b885-5e4d0cdf2fe0",
+              "name": "mensagem_telegram",
+              "value": "={{ '📋 RESUMO DE ONBOARDING KYC\\n\\n' + '🏢 Empresa: ' + $json.empresa + '\\n' + '🔢 CNPJ: ' + $json.cnpj + '\\n' + '📌 Situação na Receita: ' + $json.situacao_cadastral + '\\n' + '🔎 Status KYC: ' + $json.status_kyc + '\\n\\n' + '📝 Parecer: ' + $json.parecer_final }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1520,
+        0
+      ],
+      "id": "efddb7a5-7132-4396-b277-642378825280",
+      "name": "09 - Montar mensagem de notificação KYC"
+    },
+    {
+      "parameters": {
+        "chatId": "CHAT_ID_SANITIZADO",
+        "text": "={{ $json.mensagem_telegram }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1696,
+        0
+      ],
+      "id": "bfcae8a2-7d5e-48d0-9255-d739b8305f36",
+      "name": "10 - Notificar equipe KYC via Telegram",
+      "webhookId": "WEBHOOK_ID_SANITIZADO_10_-_NOTIFICAR_EQUIPE_KYC_VIA_TELEGRAM",
+      "credentials": {
+        "telegramApi": {
+          "id": "CREDENTIAL_ID_SANITIZADO",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e98550c-5f22-4577-969b-3b17dd1bd8e4",
+              "name": "status_consulta",
+              "value": "ERRO_NA_CONSULTA",
+              "type": "string"
+            },
+            {
+              "id": "ab62aeda-8c79-4bbe-8916-45cb20ce4dae",
+              "name": "motivo_erro",
+              "value": "={{ $json.message || $json.error?.message || 'Falha ao consultar a BrasilAPI.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        224
+      ],
+      "id": "de34a2be-f2d3-479c-a4c2-dc53d0f63113",
+      "name": "11 - Registrar falha na consulta do CNPJ"
+    },
+    {
+      "parameters": {
+        "chatId": "CHAT_ID_SANITIZADO",
+        "text": "={{ '⚠️ ALERTA — FALHA NA CONSULTA KYC\\n\\n' + '🏢 Empresa: ' + ($json.razao_social || 'Não informada') + '\\n' + '🔢 CNPJ: ' + ($json.CNPJ || 'Não informado') + '\\n' + '❌ Erro: ' + $json.motivo_erro + '\\n\\n' + '🔎 Necessária verificação manual da equipe.' }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        224
+      ],
+      "id": "7bb70c87-288b-4d95-ba55-c7d8dde1d521",
+      "name": "12 - Alertar equipe sobre falha na consulta",
+      "webhookId": "WEBHOOK_ID_SANITIZADO_12_-_ALERTAR_EQUIPE_SOBRE_FALHA_NA_CONSULTA",
+      "credentials": {
+        "telegramApi": {
+          "id": "CREDENTIAL_ID_SANITIZADO",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction calcularDV(base, pesos) {\n  const soma = base.split('').reduce((total, caractere, i) => {\n    return total + (caractere.charCodeAt(0) - 48) * pesos[i];\n  }, 0);\n\n  const resto = soma % 11;\n  return resto < 2 ? 0 : 11 - resto;\n}\n\nreturn items.map(item => {\n  const original = String(item.json.CNPJ || '');\n\n  const cnpj = original.toUpperCase().replace(/[^A-Z0-9]/g, '');\n\n  if (cnpj.length !== 14 || !/^[A-Z0-9]{12}\\d{2}$/.test(cnpj)) {\n    throw new Error('CNPJ inválido: formato incorreto.');\n  }\n\n  if (/^([A-Z0-9])\\1{13}$/.test(cnpj)) {\n    throw new Error('CNPJ inválido: caracteres repetidos.');\n  }\n\n  const dv1 = calcularDV(\n    cnpj.substring(0, 12),\n    [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]\n  );\n\n  const dv2 = calcularDV(\n    cnpj.substring(0, 12) + dv1,\n    [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]\n  );\n\n  if (!cnpj.endsWith(`${dv1}${dv2}`)) {\n    throw new Error('CNPJ inválido: dígitos verificadores incorretos.');\n  }\n\n  return {\n    json: {\n      ...item.json,\n      cnpj_normalizado: cnpj,\n      cnpj_valido: true\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        0
+      ],
+      "id": "702d9b3a-626c-4482-acc9-c6c3b01e32a1",
+      "name": "2.1 - Validar e normalizar CNPJ",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cd0db898-054a-4252-91b1-da2e23e2ba64",
+              "name": "motivo_validacao",
+              "value": "={{ $json.error?.message || $json.message || 'CNPJ inválido. Verifique os dados informados.' }}",
+              "type": "string"
+            },
+            {
+              "id": "6b315b31-a576-4a0d-9941-ce2fa23776df",
+              "name": "status_validacao",
+              "value": "CNPJ_INVALIDO",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        144,
+        256
+      ],
+      "id": "0311ccec-ced9-4e16-9f17-11c94b510d6d",
+      "name": "2.2 - Registrar CNPJ inválido"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Validação do CNPJ",
+        "completionMessage": "=Não foi possível validar o CNPJ informado.\n\nMotivo: {{ $json.motivo_validacao }}\n\nVerifique o número digitado e envie o cadastro novamente.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        368,
+        256
+      ],
+      "id": "68df5f9c-425f-41af-91d3-001603e23825",
+      "name": "2.3 - Retornar erro de CNPJ ao solicitante",
+      "webhookId": "WEBHOOK_ID_SANITIZADO_2_3_-_RETORNAR_ERRO_DE_CNPJ_AO_SOLICITANTE"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "01 - Receber cadastro da empresa": {
+      "main": [
+        [
+          {
+            "node": "2.1 - Validar e normalizar CNPJ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Consultar CNPJ da Brasil API": {
+      "main": [
+        [
+          {
+            "node": "03 - Organizar dados cadastrais",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "11 - Registrar falha na consulta do CNPJ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Organizar dados cadastrais": {
+      "main": [
+        [
+          {
+            "node": "04 - Verificar Situação cadastral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Verificar Situação cadastral": {
+      "main": [
+        [
+          {
+            "node": "06 - Preparar análise KYC de empresa ativa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "05 - registrar pendência cadastral",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - registrar pendência cadastral": {
+      "main": [
+        [
+          {
+            "node": "08 - Preparar resumo para equipe KYC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Preparar análise KYC de empresa ativa": {
+      "main": [
+        [
+          {
+            "node": "08 - Preparar resumo para equipe KYC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08 - Preparar resumo para equipe KYC": {
+      "main": [
+        [
+          {
+            "node": "09 - Montar mensagem de notificação KYC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09 - Montar mensagem de notificação KYC": {
+      "main": [
+        [
+          {
+            "node": "10 - Notificar equipe KYC via Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11 - Registrar falha na consulta do CNPJ": {
+      "main": [
+        [
+          {
+            "node": "12 - Alertar equipe sobre falha na consulta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.1 - Validar e normalizar CNPJ": {
+      "main": [
+        [
+          {
+            "node": "02 - Consultar CNPJ da Brasil API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "2.2 - Registrar CNPJ inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2.2 - Registrar CNPJ inválido": {
+      "main": [
+        [
+          {
+            "node": "2.3 - Retornar erro de CNPJ ao solicitante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "VERSION_ID_SANITIZADO",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "INSTANCE_ID_SANITIZADO"
+  },
+  "nodeGroups": [],
+  "id": "WORKFLOW_ID_SANITIZADO",
+  "tags": []
+}
