@@ -1,0 +1,264 @@
+{
+  "name": "LAB 07 - Assistente N8N com RAG (n8n + Gemini + Telegram)",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c0e3bc82-326c-4e19-9c42-eefb2c7219a8",
+              "name": "conteudo_documento",
+              "value": "MANUAL COMERCIAL — EMPRESA MODELO  Produtos: A empresa comercializa uniformes profissionais, batas, jalecos e conjuntos personalizados.  Prazo de produção: O prazo padrão de produção é de até 30 dias corridos após a confirmação do pedido.  Pagamento: O cliente realiza 50% do pagamento na confirmação do pedido e os 50% restantes na entrega.  Personalização: Os produtos podem ser personalizados conforme as necessidades do cliente, mediante aprovação prévia do orçamento.  Atendimento: As solicitações de orçamento são recebidas pela equipe comercial.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        32,
+        0
+      ],
+      "id": "6971f20a-367f-4776-8af7-bd4d39a3ba5c",
+      "name": "02 - Preparar documento de conhecimento "
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        0
+      ],
+      "id": "616bd252-e667-44b9-8d28-1cd0a3ba6a9f",
+      "name": "03 - Inserir documentos na memória vetorial"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        192,
+        192
+      ],
+      "id": "793f7e7e-a6ca-4784-8a2e-d42fbd2d3a34",
+      "name": "3.1 - Gerar embeddings - Gemini"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        192
+      ],
+      "id": "a84746ef-e068-4c4d-b976-63a2e1ee442d",
+      "name": "3.2 - Carregar conteúdo do documento"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        },
+        "prompt": "={{ $('06 - Receber pergunta pelo Telegram').item.json.message.text }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        224
+      ],
+      "id": "e60f028e-c762-42dd-9fee-25b556297133",
+      "name": "04 - Consultar memória vetorial"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "2ccbde0b-9b93-4a8f-be01-c6241014e1a7",
+      "name": "01 - Iniciar preparação da base"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um assistente comercial da Empresa Modelo.\n\nResponda à pergunta utilizando exclusivamente as informações do documento abaixo.\n\nSe a informação não estiver no documento, diga claramente que não encontrou essa informação. Nunca invente dados.\n\nDOCUMENTO:\n{{ $json.document.pageContent }}\n\nPERGUNTA:\n\n{{ $('06 - Receber pergunta pelo Telegram').item.json.message.text }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        176,
+        384
+      ],
+      "id": "c99c4ccd-99da-4d03-af0e-490860fa598f",
+      "name": "05 - Cadeia de resposta inteligente"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.8-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        368
+      ],
+      "id": "5e2aa276-3e04-444b-b505-1fd21f5c3079",
+      "name": "5.1 - Modelo de linguagem - Gemini",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "466b3c98-1378-4343-a951-212b75b64594",
+      "name": "06 - Receber pergunta pelo Telegram"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('06 - Receber pergunta pelo Telegram').item.json.message.chat.id }}",
+        "text": "={{ $('05 - Cadeia de resposta inteligente').item.json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        864,
+        -16
+      ],
+      "id": "e90f8ee6-779b-412d-be7a-3a128b3c2f14",
+      "name": "07 - Enviar resposta pelo Telegram"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "02 - Preparar documento de conhecimento ": {
+      "main": [
+        [
+          {
+            "node": "03 - Inserir documentos na memória vetorial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3.1 - Gerar embeddings - Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "03 - Inserir documentos na memória vetorial",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "04 - Consultar memória vetorial",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3.2 - Carregar conteúdo do documento": {
+      "ai_document": [
+        [
+          {
+            "node": "03 - Inserir documentos na memória vetorial",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Iniciar preparação da base": {
+      "main": [
+        [
+          {
+            "node": "02 - Preparar documento de conhecimento ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5.1 - Modelo de linguagem - Gemini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "05 - Cadeia de resposta inteligente",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Consultar memória vetorial": {
+      "main": [
+        [
+          {
+            "node": "05 - Cadeia de resposta inteligente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Receber pergunta pelo Telegram": {
+      "main": [
+        [
+          {
+            "node": "04 - Consultar memória vetorial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Cadeia de resposta inteligente": {
+      "main": [
+        [
+          {
+            "node": "07 - Enviar resposta pelo Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
