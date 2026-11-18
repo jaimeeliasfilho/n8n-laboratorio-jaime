@@ -1,0 +1,171 @@
+{
+  "name": "LAB 11 - Integração de Sistemas com APIs REST",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "345e9c6f-315d-43e0-98ef-a889b351290f",
+              "name": "id_cliente",
+              "value": "={{ $json.body.id_cliente }}",
+              "type": "number"
+            },
+            {
+              "id": "55ca98d3-5572-459c-aad9-d9368b98da94",
+              "name": "nome",
+              "value": "={{ $json.body.nome }}",
+              "type": "string"
+            },
+            {
+              "id": "a7142065-701f-4d12-802d-e0e8d42fbb74",
+              "name": "=email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "b301bcac-a5d1-4409-9e44-d9c109bdf7cd",
+              "name": "telefone",
+              "value": "={{ $json.body.telefone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "614e994a-f0ce-4123-b141-a4974e6fd410",
+      "name": "02 - Preparar Dados do Cliente - HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "=https://jsonplaceholder.typicode.com/users/{{$json.id_cliente}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "aff5b993-28f3-4182-a01e-6ff8a29c37ab",
+      "name": "03 - Consultar Cliente na API"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://jsonplaceholder.typicode.com/users/{{$json.id}}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    id: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.id_cliente,\n    name: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.nome,\n    email: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.email,\n    phone: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.telefone\n  }\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        0
+      ],
+      "id": "0f462f5c-cfdc-4ea7-86a3-78b332c42de0",
+      "name": "04 - Atualizar Cliente na API"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{\n  {\n    sucesso: true,\n    mensagem: \"Cadastro atualizado com sucesso\",\n    cliente: {\n      id: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.id_cliente,\n      nome: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.nome,\n      email: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.email,\n      telefone: $('02 - Preparar Dados do Cliente - HTTP Request').item.json.telefone\n    }\n  }\n}}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        0
+      ],
+      "id": "39fe3f4e-ef5d-411a-8b67-f6815c079b1b",
+      "name": "05 - Responder ao Sistema Solicitante"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lab11-atualizacao-cliente",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "20d6bc6b-6a96-4047-9b8d-e8efd605460f",
+      "name": "01 - Webhook",
+      "webhookId": "REDACTED_WEBHOOK_ID"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "02 - Preparar Dados do Cliente - HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "03 - Consultar Cliente na API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Consultar Cliente na API": {
+      "main": [
+        [
+          {
+            "node": "04 - Atualizar Cliente na API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Atualizar Cliente na API": {
+      "main": [
+        [
+          {
+            "node": "05 - Responder ao Sistema Solicitante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Webhook": {
+      "main": [
+        [
+          {
+            "node": "02 - Preparar Dados do Cliente - HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7c37f4c0-9c0f-4e65-a3ef-817374ca0125",
+  "meta": {
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "cy0LMYml7DDOeTyk",
+  "tags": []
+}
