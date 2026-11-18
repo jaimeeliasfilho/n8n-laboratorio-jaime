@@ -1,0 +1,373 @@
+{
+  "name": "LAB 08 - Central Inteligente de Monitoramento e Gestão de Incidentes",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://api.github.com",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        96,
+        0
+      ],
+      "id": "7ae5f2b0-52ae-408a-b857-20eebcdecc75",
+      "name": "02 - Verificar disponibilidade na API",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const resposta = $input.first().json;\n\nconst statusCode = resposta.statusCode;\n\nconst operacional = statusCode >= 200 && statusCode < 300;\n\nreturn [\n  {\n    json: {\n      servico: \"API do GitHub\",\n      statusCode: statusCode,\n      situacao: operacional ? \"OPERACIONAL\" : \"COM FALHA\",\n      mensagem: operacional\n        ? \"Serviço respondendo normalmente.\"\n        : \"Serviço apresentou uma resposta HTTP de erro.\"\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        -144
+      ],
+      "id": "5df44027-3d5a-413c-beb0-5bf189ee826a",
+      "name": "03 - Classificar Status do Serviço"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "3fe507f8-84ca-4628-ad77-57648f0f464f",
+              "leftValue": "={{ $json.situacao }}",
+              "rightValue": "OPERACIONAL",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "40e53918-94e4-49f1-8354-dc501ebbfc2a",
+      "name": "04 - Verificar Disponibilidade do Serviço"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7b5ddd1d-069a-4e0e-898b-5d8e3e74df5a",
+              "name": "servico",
+              "value": "={{ $json.servico }}",
+              "type": "string"
+            },
+            {
+              "id": "8d7129e4-078e-4953-b705-bffe95458d3a",
+              "name": "statusCode",
+              "value": "={{ $json.statusCode }}",
+              "type": "string"
+            },
+            {
+              "id": "403e80c2-4e8e-42f1-b679-23baaba8d6c7",
+              "name": "situacao",
+              "value": "={{ $json.situacao }}",
+              "type": "string"
+            },
+            {
+              "id": "fc639c77-207e-4233-ad56-f6dd6cde45e8",
+              "name": "mensagem",
+              "value": "={{ $json.mensagem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        720,
+        -96
+      ],
+      "id": "fb95b069-65cd-4368-a9ff-cb46964c725e",
+      "name": "05 - Preparar Dados do Incidente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "93bffd25-6921-4d73-b3d1-d275fd62d7bb",
+              "name": "servico",
+              "value": "API do Github",
+              "type": "string"
+            },
+            {
+              "id": "7a723b97-bf7a-4e30-9696-2bf7b345d7af",
+              "name": "statusCode",
+              "value": "={{ $json.error.status }}",
+              "type": "number"
+            },
+            {
+              "id": "e2750f28-12e0-42e0-a402-ab426349987c",
+              "name": "situacao",
+              "value": "COM FALHA",
+              "type": "string"
+            },
+            {
+              "id": "27fc0fc4-196f-43e5-b923-1be8de056ce2",
+              "name": "mensagem",
+              "value": "={{ $json.details.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        352,
+        96
+      ],
+      "id": "4514fade-1348-4e9d-81e6-c4b85383b962",
+      "name": "06 - Registrar Falha de Comunicação"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c3d806c-5147-499b-aec5-9aeea2ea4ae6",
+              "name": "servico",
+              "value": "={{ $json.servico }}",
+              "type": "string"
+            },
+            {
+              "id": "84e068c0-dc05-406c-ad75-9082f88e5e94",
+              "name": "statusCode",
+              "value": "={{ $json.statusCode }}",
+              "type": "number"
+            },
+            {
+              "id": "60c809c2-009f-4c84-a5e0-4af722e31974",
+              "name": "situacao",
+              "value": "={{ $json.situacao }}",
+              "type": "string"
+            },
+            {
+              "id": "5d24c4a6-7e96-4850-962f-f8993ad77194",
+              "name": "mensagem",
+              "value": "={{ $json.mensagem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        720,
+        96
+      ],
+      "id": "e1834f07-56a8-45ac-a076-b17dfefc2760",
+      "name": "07 - Padronizar Alerta de Incidente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49202dc0-df1e-40bc-856d-24c7356550d7",
+              "name": "mensagemAlerta",
+              "value": "={{ '🚨 ALERTA DE INCIDENTE\\n\\n' + 'Serviço: ' + $json.servico + '\\n' + 'Status HTTP: ' + $json.statusCode + '\\n' + 'Situação: ' + $json.situacao + '\\n' + 'Mensagem: ' + $json.mensagem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1008,
+        0
+      ],
+      "id": "4f7dddb2-bc10-4827-b6d4-df7fc672855e",
+      "name": "08 - Montar mensagem do Alerta"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_CHAT_ID_HERE",
+        "text": "={{ $json.mensagemAlerta }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "1519b61b-c64b-4016-8886-718c4fa54f06",
+      "name": "09 - Telegram",
+      "webhookId": "REDACTED_WEBHOOK_ID",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "864b254f-1931-4b18-a9fa-fdb5af590709",
+      "name": "01 - Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "02 - Verificar disponibilidade na API": {
+      "main": [
+        [
+          {
+            "node": "03 - Classificar Status do Serviço",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "06 - Registrar Falha de Comunicação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Classificar Status do Serviço": {
+      "main": [
+        [
+          {
+            "node": "04 - Verificar Disponibilidade do Serviço",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Verificar Disponibilidade do Serviço": {
+      "main": [
+        [],
+        [
+          {
+            "node": "05 - Preparar Dados do Incidente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Registrar Falha de Comunicação": {
+      "main": [
+        [
+          {
+            "node": "07 - Padronizar Alerta de Incidente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Preparar Dados do Incidente": {
+      "main": [
+        [
+          {
+            "node": "07 - Padronizar Alerta de Incidente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07 - Padronizar Alerta de Incidente": {
+      "main": [
+        [
+          {
+            "node": "08 - Montar mensagem do Alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08 - Montar mensagem do Alerta": {
+      "main": [
+        [
+          {
+            "node": "09 - Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "02 - Verificar disponibilidade na API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "eece3c29-0fa5-4b13-acdb-28ee74f582ad",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "cRCjpZDkJL1aogyP",
+  "tags": []
+}
