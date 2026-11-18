@@ -1,0 +1,887 @@
+{
+  "name": "LAB 10 - Automação Inteligente de Processos e Integrações",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e3a91ecd-ff76-4e56-89a7-37f390aed1d6",
+              "name": "nome_cliente",
+              "value": "={{ $json.body.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "c4d4947f-bc1c-40f2-9ff3-5bca32d75ce5",
+              "name": "empresa",
+              "value": "={{ $json.body.empresa }}",
+              "type": "string"
+            },
+            {
+              "id": "57fda8bf-e05e-4da8-833e-ff185ac51ab4",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "1335aa73-b467-475d-abe2-c68bbfa0cd26",
+              "name": "produto",
+              "value": "={{ $json.body.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "5cf1423f-cc1c-4d2e-9ea0-153f73921a47",
+              "name": "quantidade",
+              "value": "={{ $json.body.quantidade }}",
+              "type": "number"
+            },
+            {
+              "id": "d14432d7-e54c-456a-a766-41cd595ff459",
+              "name": "data_entrega_desejada",
+              "value": "={{ $json.body.data_entrega_desejada }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "1c3ebc23-3d9c-4486-9aad-6585c7d876eb",
+      "name": "02 - Preparar Dados da Solicitação Comercial"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "a8f6f992-37fc-4910-a33c-61207b10cb94",
+              "leftValue": "={{ $json.quantidade }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "4159c439-b92b-43ad-a3d6-31aa7c00de62",
+      "name": "03 - Validar Quantidade Solicitada"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "f44b396b-f556-4d78-9972-00a9bc7aead0",
+              "leftValue": "={{ $json.produto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "f95f9f1e-893e-4b6a-9781-1cc6968ffae0",
+      "name": "04 - Validar Produto Solicitado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6985deb-94f8-4304-8395-59453bb947c5",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "b85e2bf2-b60e-45f4-bbbe-7766c37bd232",
+              "name": "quantidade_solicitada",
+              "value": "={{ $json.quantidade }}",
+              "type": "number"
+            },
+            {
+              "id": "5080e681-a772-4c99-929e-820a69f63f20",
+              "name": "estoque_disponivel",
+              "value": 35,
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        896,
+        -192
+      ],
+      "id": "25601a64-eedd-4967-b9f9-bb699f5b3cac",
+      "name": "05 - Consultar Disponibilidade de Produto"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "982a04e3-75ea-4e4d-98e5-4c19c3ef7b0e",
+              "leftValue": "={{ $json.estoque_disponivel }}",
+              "rightValue": "={{ $json.quantidade_solicitada }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1120,
+        -192
+      ],
+      "id": "b5d154d1-2fe6-4b76-86ad-dcf45b52d84e",
+      "name": "06 - Verificar Estoque Disponível"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "51b7bb8c-3e6e-449e-8f39-10f1855eba0c",
+              "name": "=nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "60b12671-9450-4719-8ebe-46bce0d70b40",
+              "name": "empresa",
+              "value": "={{ $json.empresa }}",
+              "type": "string"
+            },
+            {
+              "id": "33c6e5df-ceb0-4668-85d9-7ad6dbdca093",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "7dae7a70-e50a-4e4e-93f7-0d0df3a43852",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "b500b912-a3e8-40c6-b115-a6c6bac35c4f",
+              "name": "quantidade",
+              "value": "={{ $json.quantidade }}",
+              "type": "number"
+            },
+            {
+              "id": "3c36afcc-eb39-4c8f-81cb-ea2e007353df",
+              "name": "estoque_disponivel",
+              "value": "={{ $json.estoque_disponivel }}",
+              "type": "number"
+            },
+            {
+              "id": "1592e823-a79a-4723-b2c2-f439503b861a",
+              "name": "data_entrega_desejada",
+              "value": "={{ $json.data_entrega_desejada }}",
+              "type": "string"
+            },
+            {
+              "id": "4b2f0f4a-0de2-42b7-9fae-144218e80a5b",
+              "name": "statuS_aprovacao",
+              "value": "PENDENTE DE APROVAÇÃO COMERCIAL",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1344,
+        -288
+      ],
+      "id": "1a7e14ca-a5de-45ea-8074-14e34ba924bb",
+      "name": "07 - Preparar Pedido para Aprovação Comercial"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "297986b4-e7b6-4dc4-bb00-9559fb7447f9",
+              "leftValue": "={{ $json.quantidade }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1568,
+        -288
+      ],
+      "id": "2f0adb9f-da8e-43fb-ae1b-6cfbf74fd2d0",
+      "name": "08 - Verificar Necessidade de Aprovação Comercial"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "64d64725-dcf5-44a9-b0a4-470049f78e7c",
+              "name": "nome_cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "b74b8e03-86fc-4c82-9819-78808990b8fb",
+              "name": "empresa",
+              "value": "={{ $json.empresa }}",
+              "type": "string"
+            },
+            {
+              "id": "c757b35f-6391-4e76-8695-eb9ca8789f96",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "dbf1a8d1-8cdd-44bf-aa69-00cbe6b32d17",
+              "name": "quantidade",
+              "value": "={{ $json.quantidade }}",
+              "type": "number"
+            },
+            {
+              "id": "7cb288a4-634e-49d3-ae09-f8581e5a2983",
+              "name": "status",
+              "value": "={{ $json.status ?? $json.statuS_aprovacao }}",
+              "type": "string"
+            },
+            {
+              "id": "f4f667a4-baad-43db-a056-348de1902240",
+              "name": "=responsavel",
+              "value": "={{ $json.responsavel ?? 'EQUIPE COMERCIAL' }}",
+              "type": "string"
+            },
+            {
+              "id": "09f4a095-5a25-436f-8d8a-32652a94d708",
+              "name": "motivo",
+              "value": "={{ $json.motivo ?? 'PEDIDO ACIMA DO LIMITE AUTOMÁTICO' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1792,
+        -384
+      ],
+      "id": "4ee82543-daf2-48ae-8ac2-ab03cf0a670f",
+      "name": "09 - Registrar Solicitação de Aprovação Comercial"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"cliente\": \"{{ $json.nome_cliente }}\",\n  \"empresa\": \"{{ $json.empresa }}\",\n  \"produto\": \"{{ $json.produto }}\",\n  \"quantidade\": {{ $json.quantidade }},\n  \"status\": \"{{ $json.status }}\",\n  \"responsavel\": \"{{ $json.responsavel }}\",\n  \"motivo\": \"{{ $json.motivo }}\"\n}",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2016,
+        -384
+      ],
+      "id": "ff91917f-c32d-46f5-a42b-4a5e6c85f30f",
+      "name": "10 - Integrar Solicitação ao CRM"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ac79d766-7ef0-41a3-be02-5a104e220944",
+              "name": "cliente",
+              "value": "={{ $json.cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "23f16838-5acf-4bab-b78f-8c60148cfdd2",
+              "name": "email",
+              "value": "={{ $('09 - Registrar Solicitação de Aprovação Comercial').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "4b704f6f-5ffa-4798-aa60-61cc8dda4028",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "4536a28f-cdd3-4902-a49e-4068dc22cd2f",
+              "name": "protocolo",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "d0cc4fbb-3d75-4f41-acf3-eb91576809f9",
+              "name": "mensagem",
+              "value": "={{ $('09 - Registrar Solicitação de Aprovação Comercial').item.json.status === 'APROVADO AUTOMATICAMENTE' ? 'Sua solicitação foi aprovada automaticamente. Nossa equipe dará continuidade ao atendimento e retornará com a confirmação das condições e do prazo de entrega.' : 'Sua solicitação foi recebida e encaminhada para aprovação da equipe comercial. Nossa equipe retornará com a confirmação das condições e do prazo de entrega.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2240,
+        -384
+      ],
+      "id": "fa07aeb1-344a-49e4-8a86-5e13be1d788b",
+      "name": "11 - Preparar Retorno ao Cliente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "57259195-d09a-4b44-804d-2771ef86ef51",
+              "name": "cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "488bf8e9-8ba9-49e1-8538-2f83666afd9b",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "1c258422-1502-4ac2-8b37-f25b913b9fb5",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "5af302dd-a876-4a28-839a-c0fd1c87a381",
+              "name": "protocolo",
+              "value": "NAO GERADO",
+              "type": "string"
+            },
+            {
+              "id": "5c93347e-7d33-4758-93da-a8df6b19a410",
+              "name": "mensagem",
+              "value": "Sua solicitação não pode ser processada porque a quantidade informada é inválida. Por favor, informe uma quantidade maior que zero para continuarmos com o atendimento.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        688,
+        288
+      ],
+      "id": "d5efccd9-4f42-48aa-8053-948ac30caaec",
+      "name": "3.1 - Preparar Retorno de quantidade Inválida"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6ac88dca-3350-4775-990f-46cd1cbc8f11",
+              "name": "cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "0e91cbba-704b-4ba4-be05-0e734893b8fc",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d43b83e9-d7b7-45f1-9cfa-61c412ad40dd",
+              "name": "produto",
+              "value": "NÃO INFORMADO",
+              "type": "string"
+            },
+            {
+              "id": "49c559e1-8230-4a5a-a4c8-3beeada3b9e1",
+              "name": "protocolo",
+              "value": "NÃO GERADO",
+              "type": "string"
+            },
+            {
+              "id": "16a31461-063b-4870-8dde-1d8ce0fb4fef",
+              "name": "mensagem",
+              "value": "Sua solicitação não pôde ser processada porque o produto não foi informado. Por favor, informe qual produto deseja solicitar para continuarmos com o atendimento.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        928,
+        80
+      ],
+      "id": "c586499a-d1b6-4b28-8102-473fa2228248",
+      "name": "4.1 - Preparar Retorno de Produto Não Informado"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0500622c-3341-4b1a-9452-2ee42dd1331c",
+              "name": "cliente",
+              "value": "={{ $('02 - Preparar Dados da Solicitação Comercial').item.json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "de3c086e-9985-4ccf-8bfe-dac6b85d73bf",
+              "name": "email",
+              "value": "={{ $('02 - Preparar Dados da Solicitação Comercial').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "306394cc-634b-4cbd-8219-a000be787a41",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "38057e69-3046-455e-8a0b-382058fc069b",
+              "name": "protocolo",
+              "value": "NÃO GERADO",
+              "type": "string"
+            },
+            {
+              "id": "1225d207-1533-4769-a876-06b0a8fa1fb4",
+              "name": "mensagem",
+              "value": "Sua solicitação não pôde ser atendida automaticamente porque não temos estoque suficiente para a quantidade solicitada. Nossa equipe comercial poderá verificar alternativas e informar um prazo de disponibilidade.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1344,
+        -96
+      ],
+      "id": "1fc461f2-bb72-4467-8e7a-efa4c7ff041d",
+      "name": "6.1 - Preparar Retorno de Estoque Insuficiente"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a4667380-1eac-4ddd-98d5-3519af82d5b5",
+              "name": "cliente",
+              "value": "={{ $json.nome_cliente }}",
+              "type": "string"
+            },
+            {
+              "id": "1ebabd78-49a2-431d-85a7-359d1d24b60c",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "27636260-4802-49a7-8450-73fcce318f51",
+              "name": "produto",
+              "value": "={{ $json.produto }}",
+              "type": "string"
+            },
+            {
+              "id": "f0e33beb-111a-456a-8270-1c93f3bf93df",
+              "name": "protocolo",
+              "value": "NÃO GERADO",
+              "type": "string"
+            },
+            {
+              "id": "0c05c407-cf06-48d6-8404-7eb749391514",
+              "name": "mensagem",
+              "value": "Sua solicitação foi recebida e não necessita de aprovação comercial adicional. Nossa equipe dará continuidade ao atendimento e retornará com a confirmação das condições e do prazo de entrega.",
+              "type": "string"
+            },
+            {
+              "id": "7796e2b1-0848-4138-a484-12cc29c902cf",
+              "name": "empresa",
+              "value": "={{ $('02 - Preparar Dados da Solicitação Comercial').item.json.empresa }}",
+              "type": "string"
+            },
+            {
+              "id": "fa92c3d9-2cf6-49af-88e7-2c6c027e8c28",
+              "name": "quantidade",
+              "value": "={{ $('02 - Preparar Dados da Solicitação Comercial').item.json.quantidade }}",
+              "type": "number"
+            },
+            {
+              "id": "03d2ab5e-831d-4f26-b60a-c54a01bfb898",
+              "name": "status",
+              "value": "APROVADO AUTOMATICAMENTE",
+              "type": "string"
+            },
+            {
+              "id": "fda1ba24-0e32-42c8-b014-c6007d164cca",
+              "name": "responsavel",
+              "value": "FLUXO AUTOMATICO",
+              "type": "string"
+            },
+            {
+              "id": "f66dee9b-550c-4d85-a104-4dde6edacac3",
+              "name": "motivo",
+              "value": "PEDIDO DENTRO DO LIMITE AUTOMATICO",
+              "type": "string"
+            },
+            {
+              "id": "f3328b00-5418-46b2-87cc-85f4b7c7aa12",
+              "name": "nome_cliente",
+              "value": "={{ $('02 - Preparar Dados da Solicitação Comercial').item.json.nome_cliente }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1664,
+        -80
+      ],
+      "id": "72483134-f5d5-4a84-a890-c9d25fe97208",
+      "name": "8.1 - Preparar retorno sem Aprovação Comercial"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json  }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2448,
+        -384
+      ],
+      "id": "0e008381-b745-4563-939f-8b9d0cdc3512",
+      "name": "12 - Responder ao solicitante"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "REDACTED_WEBHOOK_PATH",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0d0166dd-c517-44c3-b085-fb652f67cbf0",
+      "name": "01 - Pedido do cliente - Webhook",
+      "webhookId": "REDACTED_WEBHOOK_ID"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "02 - Preparar Dados da Solicitação Comercial": {
+      "main": [
+        [
+          {
+            "node": "03 - Validar Quantidade Solicitada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Validar Quantidade Solicitada": {
+      "main": [
+        [
+          {
+            "node": "04 - Validar Produto Solicitado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "3.1 - Preparar Retorno de quantidade Inválida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Validar Produto Solicitado": {
+      "main": [
+        [
+          {
+            "node": "05 - Consultar Disponibilidade de Produto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "4.1 - Preparar Retorno de Produto Não Informado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Consultar Disponibilidade de Produto": {
+      "main": [
+        [
+          {
+            "node": "06 - Verificar Estoque Disponível",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Verificar Estoque Disponível": {
+      "main": [
+        [
+          {
+            "node": "07 - Preparar Pedido para Aprovação Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "6.1 - Preparar Retorno de Estoque Insuficiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07 - Preparar Pedido para Aprovação Comercial": {
+      "main": [
+        [
+          {
+            "node": "08 - Verificar Necessidade de Aprovação Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08 - Verificar Necessidade de Aprovação Comercial": {
+      "main": [
+        [
+          {
+            "node": "09 - Registrar Solicitação de Aprovação Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "8.1 - Preparar retorno sem Aprovação Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09 - Registrar Solicitação de Aprovação Comercial": {
+      "main": [
+        [
+          {
+            "node": "10 - Integrar Solicitação ao CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10 - Integrar Solicitação ao CRM": {
+      "main": [
+        [
+          {
+            "node": "11 - Preparar Retorno ao Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "8.1 - Preparar retorno sem Aprovação Comercial": {
+      "main": [
+        [
+          {
+            "node": "09 - Registrar Solicitação de Aprovação Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11 - Preparar Retorno ao Cliente": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao solicitante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Pedido do cliente - Webhook": {
+      "main": [
+        [
+          {
+            "node": "02 - Preparar Dados da Solicitação Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3.1 - Preparar Retorno de quantidade Inválida": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao solicitante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4.1 - Preparar Retorno de Produto Não Informado": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao solicitante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6.1 - Preparar Retorno de Estoque Insuficiente": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao solicitante",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b6e34f25-c4a8-4f16-ae3d-36f4bb1d7700",
+  "meta": {
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "fWKxO66JwTObFqAA",
+  "tags": []
+}
