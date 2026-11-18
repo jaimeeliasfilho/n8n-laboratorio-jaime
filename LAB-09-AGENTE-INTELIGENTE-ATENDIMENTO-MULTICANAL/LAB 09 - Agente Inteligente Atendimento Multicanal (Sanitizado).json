@@ -1,0 +1,491 @@
+{
+  "name": "LAB  09 - Agente Inteligente Atendimento Multicanal",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "15f9203a-24f4-427a-a1ee-8072b60d75cd",
+              "name": "mensagem_cliente",
+              "value": "={{ $json.body.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "58ae5b58-b670-43e5-9f17-6f52d8e0b2d9",
+              "name": "data_recebimento",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "0a6a8ef0-c6c3-4c48-b05d-9adca81b4a39",
+              "name": "name",
+              "value": "={{ $json.body.message.from.first_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -528,
+        80
+      ],
+      "id": "a067640f-f2bc-4715-bb8e-d12a9b021588",
+      "name": "02 - Preparar dados"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.mensagem_cliente }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "ORCAMENTO",
+              "description": "dúvidas sobre preços, valores e solicitações de orçamento."
+            },
+            {
+              "category": "PEDIDO",
+              "description": "Solicitações sobre pedidos já realizados ou novos pedidos, incluindo consulta de status, acompanhamento, identificação, confirmação, alteração e informações gerais sobre o pedido. Não classifique como PEDIDO quando a pergunta for especificamente sobre prazo de produção, previsão de conclusão ou data de entrega."
+            },
+            {
+              "category": "PRAZO",
+              "description": "dúvidas sobre tempo de produção, previsão de conclusão do pedido e previsão de recebimento ou entrega. Não utilizar para perguntas sobre cidades, estados ou regiões atendidas."
+            },
+            {
+              "category": "PAGAMENTO",
+              "description": "dúvidas sobre pagamentos, parcelas e comprovantes."
+            },
+            {
+              "category": "RECLAMACAO",
+              "description": "insatisfações, problemas ou reclamações."
+            },
+            {
+              "category": "ATENDIMENTO_HUMANO",
+              "description": "pedidos para falar com uma pessoa."
+            },
+            {
+              "category": "OUTROS",
+              "description": "perguntas sobre regiões, cidades e estados atendidos, locais de entrega e assuntos gerais que não se encaixam nas demais categorias."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "88d7b7f2-df8e-4a6f-a228-8473fc863df8",
+      "name": "03 - Cassifificar solicitação com IA"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b94f23c-843b-4683-a8f9-b2932a36c9e5",
+              "name": "resposta",
+              "value": "Obrigado pelo seu interesse! 😊  Recebemos sua solicitação de orçamento. Vamos encaminhá-la para confirmação de valores e disponibilidade. Em breve, nossa equipe retornará com as informações.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -448
+      ],
+      "id": "62415c8d-9bd9-4a30-930a-cb734f7277f4",
+      "name": "05 - Preparar resposta orçamento"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a34cd238-b97f-42cc-ac84-279b50ad4a0b",
+              "name": "resposta",
+              "value": "Olá! 😊 Recebemos sua solicitação sobre o pedido.  Para que nossa equipe possa ajudar, informe o número do pedido ou o nome utilizado na solicitação. Vamos verificar as informações e retornar com uma atualização.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -272
+      ],
+      "id": "078adbc6-37ef-4668-8663-72f44dac4e59",
+      "name": "06 - Preparar resposta do pedido"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0d58bcff-c7dc-45c4-bbbe-1f3142f0ca78",
+              "name": "resposta",
+              "value": "Olá! 😊 Obrigado pelo seu contato.  O prazo de produção e entrega pode variar conforme o produto e os detalhes do pedido.  Para informar uma previsão correta, nossa equipe precisa consultar as condições do seu pedido. Em breve, retornaremos com essa informação!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        -80
+      ],
+      "id": "a3f4235c-6a24-4ed6-9891-b8ef299922e2",
+      "name": "07 - Preparar resposta de prazo"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "80c026e9-10c3-4afa-833a-bc51ee1e0e79",
+              "name": "resposta",
+              "value": "Olá! 😊 Obrigado pelo contato.  As condições de pagamento, incluindo opções de parcelamento, são confirmadas no momento da negociação do pedido.  Nossa equipe poderá informar as opções disponíveis e esclarecer suas dúvidas.  Estamos à disposição!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        80
+      ],
+      "id": "0b0c0150-b231-4f67-ae0f-4688d0f4cbc8",
+      "name": "08 - Preparar resposta de pagamento"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c6908593-480d-4b17-8bdd-fd834ddd53b6",
+              "name": "resposta",
+              "value": "Olá! Sentimos muito que sua experiência não tenha sido como esperava. ❤️  Agradecemos por nos informar sobre o ocorrido. Sua reclamação é importante para nós e será encaminhada à nossa equipe para análise.  Se possível, conte um pouco mais sobre o problema e informe o número do pedido para facilitar a identificação.  Vamos fazer o possível para ajudar!",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        240
+      ],
+      "id": "634506af-f090-4174-8a5f-3643d9a38f47",
+      "name": "09 - Preparar resposta de reclamação"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43e863e1-3e73-4929-be63-26dcd7ab39e8",
+              "name": "resposta",
+              "value": "Olá! 😊 Claro, será um prazer ajudar você.  Entendemos que prefere conversar diretamente com uma pessoa da nossa equipe.  Sua solicitação será encaminhada para atendimento humano. Assim que possível, nossa equipe dará continuidade à conversa.  Obrigado pela preferência! ❤️",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        400
+      ],
+      "id": "851e67db-aedb-43a0-87b0-759ad58bd22e",
+      "name": "10 - Preparar resposta de atendimento humano"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0fe891c5-eb80-4964-9bb2-3110ad957cbb",
+              "name": "resposta",
+              "value": "Olá! 😊 Obrigado por entrar em contato.  Não consegui identificar exatamente sua solicitação, mas quero ajudar!  Você poderia explicar um pouquinho melhor o que precisa? Assim, podemos direcionar sua mensagem para a pessoa certa da nossa equipe.  Estamos à disposição! ❤️",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        544
+      ],
+      "id": "e242911e-a81d-414c-9b21-1dd7d865a3da",
+      "name": "11 - Preparar resposta para outros assuntos"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openrouter/free",
+          "mode": "id"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -304,
+        352
+      ],
+      "id": "1cbccc3b-f371-4250-98f5-40673ba98d08",
+      "name": "04 - OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "REDACTED_WEBHOOK_PATH",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -832,
+        80
+      ],
+      "id": "f3186887-f279-486c-bb20-b80a699f23a5",
+      "name": "01 - Solicitação do cliente - Webhook",
+      "webhookId": "REDACTED_WEBHOOK_ID"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"status\": \"sucesso\",\n  \"cliente\": \"{{$json.name}}\",\n  \"mensagem\": \"{{$json.resposta}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1104,
+        96
+      ],
+      "id": "d3097cf8-29c1-4d9c-89e4-ecb31dd3ab3c",
+      "name": "12 - Responder ao Cliente - Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "02 - Preparar dados": {
+      "main": [
+        [
+          {
+            "node": "03 - Cassifificar solicitação com IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Cassifificar solicitação com IA": {
+      "main": [
+        [
+          {
+            "node": "05 - Preparar resposta orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "06 - Preparar resposta do pedido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "07 - Preparar resposta de prazo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "08 - Preparar resposta de pagamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "09 - Preparar resposta de reclamação",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "10 - Preparar resposta de atendimento humano",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "11 - Preparar resposta para outros assuntos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Preparar resposta orçamento": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao Cliente - Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Preparar resposta do pedido": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao Cliente - Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07 - Preparar resposta de prazo": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao Cliente - Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08 - Preparar resposta de pagamento": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao Cliente - Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10 - Preparar resposta de atendimento humano": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao Cliente - Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11 - Preparar resposta para outros assuntos": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao Cliente - Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "09 - Preparar resposta de reclamação": {
+      "main": [
+        [
+          {
+            "node": "12 - Responder ao Cliente - Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "03 - Cassifificar solicitação com IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Solicitação do cliente - Webhook": {
+      "main": [
+        [
+          {
+            "node": "02 - Preparar dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "533839e7-370d-4918-a87e-f1bf186c4f1e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "xxjy8LEpoL79r8dZ",
+  "tags": []
+}
