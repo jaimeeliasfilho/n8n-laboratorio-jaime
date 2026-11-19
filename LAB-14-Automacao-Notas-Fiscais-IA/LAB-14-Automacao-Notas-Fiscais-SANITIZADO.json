@@ -1,0 +1,562 @@
+{
+  "name": "LAB 14 - Processamento Inteligente de Documentos com IA",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Recebimento de Documento Fiscal",
+        "formDescription": "Envie uma nota fiscal em PDF para processamento com IA",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nota Fiscal (PDF)",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "✅ Documento recebido com sucesso!  Sua nota fiscal foi recebida e processada pelo sistema.  Caso sejam identificadas inconsistências, o documento será encaminhado para conferência humana.  Obrigado por utilizar nosso sistema!"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "06249958-d5e0-4503-9255-ae65eb909ef6",
+      "name": "01 - Receber Documento PDF",
+      "webhookId": "00000000-0000-0000-0000-000000000001"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Nota_Fiscal__PDF_",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "34639387-f2e6-4752-8069-0e1d7717c024",
+      "name": "02 - Extrair Texto do PDF"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "223202b7-3b95-48da-8dd4-4a41aacd5093",
+              "name": "texto_documento",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "560ecc0c-041a-4ee4-a819-b59e701a9398",
+      "name": "03 - Preparar texto para IA"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openrouter/free",
+          "mode": "list",
+          "cachedResultName": "openrouter/free"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        720,
+        208
+      ],
+      "id": "fa1d4579-40b9-4e28-beee-e522aa2123dc",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "CREDENTIAL_ID_OPENAI_API",
+          "name": "OpenAI / OpenRouter Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um assistente especializado em processamento inteligente de documentos fiscais.\n\nAnalise o texto abaixo e extraia as informações da nota fiscal.\n\nRegras:\n\n- Extraia somente informações presentes no documento.\n- Não invente nem deduza dados ausentes.\n- Preserve CNPJ, número da nota e série como texto.\n- Converta valores monetários para números decimais.\n- Quantidades devem ser números.\n- Se algum campo textual estiver ausente, retorne null.\n- Não confunda o valor total dos produtos com o valor total da nota.\n- Respeite rigorosamente os nomes e os tipos dos campos definidos pelo analisador de saída.\n- Não acrescente explicações.\n\nTexto do documento:\n\n{{ $json.texto_documento }}",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        720,
+        0
+      ],
+      "id": "55c24bc6-e769-4815-8ff5-245c3b9a0350",
+      "name": "04 - Interpretar Nota Fiscal com IA"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"tipo_documento\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"fornecedor\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"cnpj_fornecedor\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"numero_nota\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"serie\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"data_emissao\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"destinatario\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"cnpj_destinatario\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"produtos\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"descricao\": {\n            \"type\": [\"string\", \"null\"]\n          },\n          \"quantidade\": {\n            \"type\": [\"number\", \"null\"]\n          },\n          \"valor_unitario\": {\n            \"type\": [\"number\", \"null\"]\n          },\n          \"valor_total\": {\n            \"type\": [\"number\", \"null\"]\n          }\n        },\n        \"required\": [\n          \"descricao\",\n          \"quantidade\",\n          \"valor_unitario\",\n          \"valor_total\"\n        ],\n        \"additionalProperties\": false\n      }\n    },\n    \"valor_total_produtos\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"valor_total_nota\": {\n      \"type\": [\"number\", \"null\"]\n    },\n    \"forma_pagamento\": {\n      \"type\": [\"string\", \"null\"]\n    },\n    \"observacao\": {\n      \"type\": [\"string\", \"null\"]\n    }\n  },\n  \"required\": [\n    \"tipo_documento\",\n    \"fornecedor\",\n    \"cnpj_fornecedor\",\n    \"numero_nota\",\n    \"serie\",\n    \"data_emissao\",\n    \"destinatario\",\n    \"cnpj_destinatario\",\n    \"produtos\",\n    \"valor_total_produtos\",\n    \"valor_total_nota\",\n    \"forma_pagamento\",\n    \"observacao\"\n  ],\n  \"additionalProperties\": false\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        208
+      ],
+      "id": "e22c1c2b-7b00-4c2f-97d9-4d36afc54d9a",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7e72ee39-2835-43f6-8985-819c534e77f7",
+              "leftValue": "={{ $json.output.cnpj_destinatario }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "255dd9a7-5299-49a1-840a-7e58fe340c6e",
+              "leftValue": "={{ $json.output.numero_nota }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "bc5fae77-c937-4079-8f0d-26c039994025",
+              "leftValue": "={{ $json.output.data_emissao }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "51c54d2e-8244-413f-9adb-2174970fcdfc",
+              "leftValue": "={{ $json.output.valor_total_nota }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "8000d7d5-61d7-450f-b9a8-3b8a57357d11",
+              "leftValue": "={{ $json.output.produtos.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "a35535e4-c799-45ff-9284-cd7707cabded",
+      "name": "05 - Validar Dados da Nota Fiscal"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e8aa458d-089a-4196-89fc-f896accad1e7",
+              "name": "status_processamento",
+              "value": "PENDENTE DE REVISÃO",
+              "type": "string"
+            },
+            {
+              "id": "628c4757-1b94-48f2-93a5-3b02904a20f8",
+              "name": "motivo",
+              "value": "Documento com informações obrigatórias ausentes ou inválidas. ",
+              "type": "string"
+            },
+            {
+              "id": "115a8d87-2802-4020-ad94-b304175c11f7",
+              "name": "acao_necessaria",
+              "value": "Encaminhar para conferência humana antes de prosseguir.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1312,
+        96
+      ],
+      "id": "38e76efe-d783-4f66-846a-f48abd7ca038",
+      "name": "06 - Registrar Documento para  Revisão"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0cc4019e-1851-4f68-ad84-224eeb03681e",
+              "name": "status_processamento",
+              "value": "APROVADO",
+              "type": "string"
+            },
+            {
+              "id": "e81fd4eb-fb4e-4576-8366-b4f9e8db213f",
+              "name": "fornecedor",
+              "value": "={{ $json.output.fornecedor }}",
+              "type": "string"
+            },
+            {
+              "id": "627a49ef-2f83-4a8d-b19b-ba916d70b03f",
+              "name": "cnpj_fornecedor",
+              "value": "={{ $json.output.cnpj_fornecedor }}",
+              "type": "string"
+            },
+            {
+              "id": "ec024f78-3660-4c8c-a20d-68ab0ff73836",
+              "name": "numero_nota",
+              "value": "={{ $json.output.numero_nota }}",
+              "type": "string"
+            },
+            {
+              "id": "ec50a784-7b7e-48f5-a1f1-29e1b2429776",
+              "name": "data_emissao",
+              "value": "={{ $json.output.data_emissao }}",
+              "type": "string"
+            },
+            {
+              "id": "23832250-e012-4f03-8c55-cd5a53c49670",
+              "name": "valor_total_nota",
+              "value": "={{ $json.output.valor_total_nota }}",
+              "type": "number"
+            },
+            {
+              "id": "f7d700ec-5181-488b-be87-2e2260b139e5",
+              "name": "quantidade_produtos",
+              "value": "={{ $json.output.produtos[1].quantidade }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1312,
+        -96
+      ],
+      "id": "d97bb6ba-8174-4358-bc83-163bd24edad3",
+      "name": "07 - Preparar Dados da Nota fiscal"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "SEU_ID_DA_PLANILHA_GOOGLE_SHEETS",
+          "mode": "list",
+          "cachedResultName": "LAB 14 - Controle de Notas Fiscais",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/SEU_ID_DA_PLANILHA_GOOGLE_SHEETS/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/SEU_ID_DA_PLANILHA_GOOGLE_SHEETS/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status_processamento": "={{ $json.status_processamento }}",
+            "fornecedor": "={{ $json.fornecedor }}",
+            "cnpj_fornecedor": "={{ $json.cnpj_fornecedor }}",
+            "numero_nota": "={{ $json.numero_nota }}",
+            "data_emissao": "={{ $json.data_emissao }}",
+            "valor_total_nota": "={{ $json.valor_total_nota }}",
+            "quantidade_produtos": "={{ $json.quantidade_produtos }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "status_processamento",
+              "displayName": "status_processamento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fornecedor",
+              "displayName": "fornecedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cnpj_fornecedor",
+              "displayName": "cnpj_fornecedor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "numero_nota",
+              "displayName": "numero_nota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data_emissao",
+              "displayName": "data_emissao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "valor_total_nota",
+              "displayName": "valor_total_nota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "quantidade_produtos",
+              "displayName": "quantidade_produtos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        -96
+      ],
+      "id": "220d329f-5d5f-4e9c-a703-7abfb5dd70a1",
+      "name": "08 - Registrar Notas Fiscais no Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CREDENTIAL_ID_GOOGLE_SHEETS",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "SEU_CHAT_ID_TELEGRAM",
+        "text": "=🚨 ALERTA DE REVISÃO FISCAL  Uma nota fiscal foi encaminhada para conferência humana.  Status: {{ $json.status_processamento }}  Motivo: {{ $json.motivo }}  Ação necessária: {{ $json.acao_necessaria }}  Solicita-se a conferência do documento antes de prosseguir.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1536,
+        96
+      ],
+      "id": "659c9356-5dc4-4d28-82cf-38a40838e4b8",
+      "name": "Send a text message",
+      "webhookId": "00000000-0000-0000-0000-000000000002",
+      "credentials": {
+        "telegramApi": {
+          "id": "CREDENTIAL_ID_TELEGRAM_API",
+          "name": "Telegram Bot Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "01 - Receber Documento PDF": {
+      "main": [
+        [
+          {
+            "node": "02 - Extrair Texto do PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Extrair Texto do PDF": {
+      "main": [
+        [
+          {
+            "node": "03 - Preparar texto para IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "04 - Interpretar Nota Fiscal com IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Preparar texto para IA": {
+      "main": [
+        [
+          {
+            "node": "04 - Interpretar Nota Fiscal com IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "04 - Interpretar Nota Fiscal com IA",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Interpretar Nota Fiscal com IA": {
+      "main": [
+        [
+          {
+            "node": "05 - Validar Dados da Nota Fiscal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Validar Dados da Nota Fiscal": {
+      "main": [
+        [
+          {
+            "node": "07 - Preparar Dados da Nota fiscal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "06 - Registrar Documento para  Revisão",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07 - Preparar Dados da Nota fiscal": {
+      "main": [
+        [
+          {
+            "node": "08 - Registrar Notas Fiscais no Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Registrar Documento para  Revisão": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "00000000-0000-0000-0000-000000000000",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "nodeGroups": [],
+  "id": "WORKFLOW_ID_SANITIZADO",
+  "tags": []
+}
