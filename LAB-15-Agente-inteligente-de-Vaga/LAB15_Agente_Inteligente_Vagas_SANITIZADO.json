@@ -1,0 +1,722 @@
+{
+  "name": "LAB 15  - Agente Inteligente de Busca e Candidaturas com IA (n8n + OpenRouter + Telegram)",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12219bc4-8f77-4ed1-924c-9afc589b9a3a",
+              "name": "cargo_alvo",
+              "value": "Analista de Automação",
+              "type": "string"
+            },
+            {
+              "id": "ad7463bb-bcca-4fbf-a518-36a19f2d9bda",
+              "name": "nivel",
+              "value": "Junior / Assistente",
+              "type": "string"
+            },
+            {
+              "id": "f09ea5cd-400b-4fdc-8e6b-9a714a367f43",
+              "name": "localizacao",
+              "value": "São Paulo  - SP",
+              "type": "string"
+            },
+            {
+              "id": "fe91e1e6-d0de-4d10-81c9-7e21bf0c3420",
+              "name": "modalidade",
+              "value": "Remoto ou Híbrido",
+              "type": "string"
+            },
+            {
+              "id": "c90f3eee-2901-469d-9d02-788400d3804b",
+              "name": "ferramentas",
+              "value": "n8n, JavaScript, APis, Gemini, ChatGPT, Python básico.",
+              "type": "string"
+            },
+            {
+              "id": "cb143f71-2a35-463b-9a78-d36ad33edc6e",
+              "name": "areas_interesse",
+              "value": "Automação de processos, IA, agentes, integrações e RPA.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "c4f4e080-4188-4ee4-ac3f-7ae440460775",
+      "name": "02 - Configurar Perfil Profissional"
+    },
+    {
+      "parameters": {
+        "url": "https://www.joonow.com/api/v1/jobs",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "Analista de DTI"
+            },
+            {
+              "name": "country",
+              "value": "BR"
+            },
+            {
+              "name": "work"
+            },
+            {
+              "name": "level",
+              "value": "Entry,Operational"
+            },
+            {
+              "name": "days",
+              "value": "30"
+            },
+            {
+              "name": "lang",
+              "value": "pt"
+            },
+            {
+              "name": "limit",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "fd7d776b-c4f1-4ed5-9b07-b6c844bca5a2",
+      "name": "03 - Consultar Fontes de Vagas"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1.1,
+      "position": [
+        608,
+        0
+      ],
+      "id": "2b5c505a-fcba-4ac6-bc09-dd2f98bc4ed9",
+      "name": "04 - Separar Vagas"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9624caf7-edc8-4bfc-95b0-15dd90d71ffe",
+              "name": "vaga_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "95cd2777-6967-4fc4-a8e3-dfeb7fbc56bd",
+              "name": "titulo",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "ff905c8e-0002-43e4-b944-98df3850955e",
+              "name": "empresa",
+              "value": "={{ $json.company.name }}",
+              "type": "string"
+            },
+            {
+              "id": "030bbe29-75ee-43f0-85cf-293a5517800a",
+              "name": "cidade",
+              "value": "={{ $json.location.city }}",
+              "type": "string"
+            },
+            {
+              "id": "fa8c602e-f80f-4aff-96ae-0367317b79b8",
+              "name": "modalidade",
+              "value": "={{ $json.workModel }}",
+              "type": "string"
+            },
+            {
+              "id": "4eb870d3-2f38-4573-842d-f6703acf32b7",
+              "name": "senioridade",
+              "value": "={{ $json.seniority }}",
+              "type": "string"
+            },
+            {
+              "id": "3a872352-497b-48dc-8877-4fe5018a53b8",
+              "name": "url_vaga",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "e51169ed-cf26-4468-b455-a354dab3de10",
+              "name": "url_candidatura",
+              "value": "={{ $json.applyUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "41f48355-5aa5-4f55-9543-83ea71c619ce",
+              "name": "data_publicacao",
+              "value": "={{ $json.postedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "45ee89f6-5a35-4319-9b3f-948e4c25771b",
+              "name": "=origem",
+              "value": "={{  $json.origem || 'Joonow'  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        800,
+        0
+      ],
+      "id": "444012fe-a4e0-4e59-a49b-32e21fed2a97",
+      "name": "05 - Padronizar Dados da Vaga"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.joonow.com/api/v1/jobs/{{ $json.vaga_id }}",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "afa10ffb-e995-4142-bb07-4287cbdd8d52",
+      "name": "06 - Obter Descrição da Vaga"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1",
+              "mergeMode": "shallowMerge"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1184,
+        -192
+      ],
+      "id": "c183cc69-2641-4971-b62f-f32387afc3bc",
+      "name": "07 - Consolidar Dados da Vaga"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openrouter/free",
+          "mode": "list",
+          "cachedResultName": "openrouter/free"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        1424,
+        -32
+      ],
+      "id": "207672bb-e9bd-436e-b3ed-51b7060aee97",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Configure your own credential in n8n"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um especialista em recrutamento e seleção de profissionais de tecnologia, automação e inteligência artificial.\n\nSua tarefa é avaliar a compatibilidade entre a vaga recebida e o perfil profissional descrito abaixo.\n\n## 1. DADOS DA VAGA\n\nTítulo: {{ $json.titulo }}\nEmpresa: {{ $json.empresa }}\nCidade: {{ $json.cidade }}\nModalidade: {{ $json.modalidade }}\nSenioridade: {{ $json.senioridade }}\nOrigem: {{ $json.origem }}\nLink da vaga: {{ $json.url_vaga }}\nLink de candidatura: {{ $json.url_candidatura }}\n\nDescrição:\n{{ $json.description }}\n\nCompetências informadas pela empresa:\n{{ JSON.stringify($json.skills || []) }}\n\n## 2. PERFIL PROFISSIONAL DO CANDIDATO\n\nFormação:\n- Graduação em Publicidade e Propaganda.\n\nExperiência profissional:\n- Experiência em análise documental, processos administrativos, suporte corporativo, compliance e governança.\n- Atuação como Analista Jurídico Pleno na Interfile, em operações de suporte ao BTG Pactual Corporate.\n- Utilização de Salesforce e análise de documentação jurídica e societária.\n- Experiência anterior em marketing, atendimento e processos comerciais.\n- Projeto freelance com desenvolvimento de catálogo digital e soluções de automação para um negócio.\n\nConhecimentos e ferramentas:\n- n8n: criação e configuração de workflows de automação.\n- JavaScript: lógica e expressões para tratamento de dados.\n- APIs REST, requisições HTTP e integrações.\n- Inteligência artificial aplicada à automação.\n- ChatGPT e Google Gemini.\n- Python básico.\n- RAG, ChromaDB e LlamaIndex.\n- Excel e Salesforce.\n- Integrações com Telegram.\n\nProjetos de portfólio:\n- Triagem inteligente de atendimento com IA.\n- Onboarding KYC com validação de CNPJ.\n- Assistente com RAG e IA.\n- Automação de processamento e validação de notas fiscais.\n- Projetos de RPA e integração de sistemas.\n\nFormação complementar:\n- Bootcamp Santander/DIO de Automação com n8n.\n- Formação complementar em Python e RAG.\n\nObjetivo profissional:\nAtuar como Analista de Automação, Analista de Automação com IA, Assistente de Automação ou em funções relacionadas a workflows, integrações, agentes de IA e automação de processos.\n\n## 3. REGRAS OBRIGATÓRIAS DA AVALIAÇÃO\n\n- Não invente experiências, ferramentas, certificações ou conhecimentos.\n- Não considere experiência em automação de testes como equivalente a automação de processos.\n- Diferencie conhecimento prático, conhecimento básico e experiência profissional.\n- Considere competências transferíveis de outras áreas.\n- Não penalize automaticamente a formação em Publicidade e Propaganda, mas identifique quando uma formação técnica for obrigatória.\n- Considere a senioridade e o objetivo profissional do candidato.\n- Identifique requisitos obrigatórios não atendidos.\n- Não atribua compatibilidade elevada apenas porque a descrição contém a palavra automação.\n\n## 4. FORMATO DA AVALIAÇÃO\n\nApresente:\n\n1. NOTA DE COMPATIBILIDADE: de 0 a 100.\n2. CLASSIFICAÇÃO: alta, média ou baixa.\n3. PONTOS FORTES: conhecimentos e experiências compatíveis.\n4. REQUISITOS ATENDIDOS: o que o candidato comprova.\n5. LACUNAS: conhecimentos ou requisitos que faltam.\n6. COMPETÊNCIAS TRANSFERÍVEIS: experiências que podem agregar valor.\n7. ANÁLISE DA MODALIDADE E SENIORIDADE.\n8. RECOMENDAÇÃO: candidatar-se, candidatar-se com ressalvas ou não priorizar.\n9. JUSTIFICATIVA: explique a recomendação de forma objetiva.\n\nSeja criterioso, realista e transparente. A nota deve refletir a aderência efetiva entre o perfil e a oportunidade, não apenas a semelhança de palavras-chave.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1424,
+        -192
+      ],
+      "id": "e8f89ac1-4c53-426d-b7bd-68fe3d0c7845",
+      "name": "08 - Avaliar Compatibilidade com IA"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"nota_compatibilidade\": 34,\n  \"classificacao\": \"BAIXA\",\n  \"pontos_fortes\": [\n    \"Conhecimento prático em n8n e automação de processos\",\n    \"Experiência com APIs REST e integrações\"\n  ],\n  \"requisitos_atendidos\": [\n    \"Experiência com processos administrativos\",\n    \"Formação complementar em automação com n8n\"\n  ],\n  \"lacunas\": [\n    \"Ausência de experiência com Tosca\",\n    \"Ausência de experiência em automação de testes\"\n  ],\n  \"competencias_transferiveis\": [\n    \"Lógica de automação\",\n    \"Validação e tratamento de dados\"\n  ],\n  \"analise_modalidade_senioridade\": \"Modalidade remota compatível; experiência técnica específica insuficiente.\",\n  \"recomendacao\": \"NAO_PRIORIZAR\",\n  \"justificativa\": \"A vaga exige conhecimentos específicos que não estão comprovados no perfil.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1568,
+        16
+      ],
+      "id": "302acf87-023d-4936-8d14-aa2a9e1a24d2",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {
+          "clashHandling": {
+            "values": {
+              "resolveClash": "preferInput1"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1744,
+        240
+      ],
+      "id": "d8112644-e843-4f38-8420-5d13d4ee14dd",
+      "name": "09 - Unificar Dados da Vaga e Avliação de IA"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ \n  $json.output.nota_compatibilidade >= 75 ? 0 :\n  $json.output.nota_compatibilidade >= 50 ? 1 : 2\n}}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.5,
+      "position": [
+        1744,
+        -208
+      ],
+      "id": "9f5e8f31-89c0-4cf6-848b-53067b249317",
+      "name": "10 - Classificar Compatibilidade da Vaga"
+    },
+    {
+      "parameters": {
+        "chatId": "REPLACE_WITH_YOUR_TELEGRAM_CHAT_ID",
+        "text": "={{\n'🤖 AGENTE INTELIGENTE DE VAGAS\\n\\n' +\n'📌 ' + $json.titulo + '\\n' +\n'🏢 Empresa: ' + $json.empresa + '\\n' +\n'📍 Local: ' + $json.cidade + '\\n' +\n'💻 Modalidade: ' + $json.modalidade + '\\n\\n' +\n'🎯 COMPATIBILIDADE: ' + $json.output.nota_compatibilidade + '/100\\n' +\n'📊 Classificação: ' + $json.output.classificacao.toUpperCase() + '\\n' +\n'📢 Recomendação: ' + $json.output.recomendacao + '\\n\\n' +\n'💪 PONTOS FORTES\\n' +\n$json.output.pontos_fortes.map(x => '• ' + x).join('\\n') + '\\n\\n' +\n'⚠️ LACUNAS IDENTIFICADAS\\n' +\n$json.output.lacunas.map(x => '• ' + x).join('\\n') + '\\n\\n' +\n'🧠 JUSTIFICATIVA\\n' +\n$json.output.justificativa + '\\n\\n' +\n'🔗 ACESSAR VAGA:\\n' + $json.url_vaga + '\\n\\n' +\n'📝 CANDIDATURA:\\n' + $json.url_candidatura\n}}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        -192
+      ],
+      "id": "f2991c03-3375-4237-9ba3-b75ce6a529bf",
+      "name": "11 - Enviar Notificações de Vaga",
+      "webhookId": "SANITIZED_WEBHOOK_ID",
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL_ID",
+          "name": "Configure your own credential in n8n"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "bda940ed-e439-44cb-8c23-8ffb3b2b51c2",
+      "name": "01 - Manual Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://jobicy.com/api/jobs?count=20&geo=brazil",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        256,
+        256
+      ],
+      "id": "81c8df2e-b223-4679-871e-ad50449c0288",
+      "name": "03 B - Consultar Vagas Jobicy"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=jobs",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        256
+      ],
+      "id": "3cfb9713-f2b1-4e0e-8738-315d9929a9d4",
+      "name": "04 B - Separar vagas Jobicy"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c314ea9-1cce-4086-9f3b-d034cdf7d95a",
+              "name": "vaga_id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "9725a230-9d1b-4251-89e7-02e0951b5147",
+              "name": "titulo",
+              "value": "={{ $json.jobTitle }}",
+              "type": "string"
+            },
+            {
+              "id": "cbb0dbdb-3dde-44fa-b97a-d6b334b0e798",
+              "name": "empresa",
+              "value": "={{ $json.companyName }}",
+              "type": "string"
+            },
+            {
+              "id": "8c8fac23-a604-40ef-a801-7e06e6ca46fc",
+              "name": "cidade",
+              "value": "={{ $json.jobGeo }}",
+              "type": "string"
+            },
+            {
+              "id": "0fc3f1e1-3d88-4412-8fae-e311b8f8add9",
+              "name": "modalidade",
+              "value": "={{ $json.jobType }}",
+              "type": "array"
+            },
+            {
+              "id": "d783cff9-813f-4309-a660-0ec9857f704f",
+              "name": "senioridade",
+              "value": "={{ $json.jobLevel }}",
+              "type": "string"
+            },
+            {
+              "id": "77691078-24a9-47df-92e4-9bdbffe37438",
+              "name": "url_vaga",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "f78cc96f-2126-40ed-855f-89fed58b7913",
+              "name": "url_candidatura",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "d3219ca2-9953-42df-8f73-2b68033e8861",
+              "name": "data_publicacao",
+              "value": "={{ $json.pubDate }}",
+              "type": "string"
+            },
+            {
+              "id": "e97b1f0f-f58e-4ded-ac99-b72baab1f1d1",
+              "name": "descricao",
+              "value": "={{ $json.jobDescription }}",
+              "type": "string"
+            },
+            {
+              "id": "6f0644d2-5622-4737-b30f-d88dbb9f4d73",
+              "name": "origem",
+              "value": "Jobicy",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        656,
+        256
+      ],
+      "id": "11d5053c-0124-44af-b457-1963479f25a2",
+      "name": "05B - Padronizar dados da Vaga Jobicy"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1184,
+        256
+      ],
+      "id": "89832b34-1a99-45f1-87eb-d5c93a0f0dc0",
+      "name": "12 - Unificar Fontes de  Vagas"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        -240
+      ],
+      "id": "7a623edd-7477-46e6-a9c9-529b250b9d97",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "02 - Configurar Perfil Profissional": {
+      "main": [
+        [
+          {
+            "node": "03 - Consultar Fontes de Vagas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Consultar Fontes de Vagas": {
+      "main": [
+        [
+          {
+            "node": "04 - Separar Vagas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Separar Vagas": {
+      "main": [
+        [
+          {
+            "node": "05 - Padronizar Dados da Vaga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Padronizar Dados da Vaga": {
+      "main": [
+        [
+          {
+            "node": "06 - Obter Descrição da Vaga",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "07 - Consolidar Dados da Vaga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "06 - Obter Descrição da Vaga": {
+      "main": [
+        [
+          {
+            "node": "07 - Consolidar Dados da Vaga",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "08 - Avaliar Compatibilidade com IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "07 - Consolidar Dados da Vaga": {
+      "main": [
+        [
+          {
+            "node": "09 - Unificar Dados da Vaga e Avliação de IA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "12 - Unificar Fontes de  Vagas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "08 - Avaliar Compatibilidade com IA",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "08 - Avaliar Compatibilidade com IA": {
+      "main": [
+        [
+          {
+            "node": "09 - Unificar Dados da Vaga e Avliação de IA",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "09 - Unificar Dados da Vaga e Avliação de IA": {
+      "main": [
+        [
+          {
+            "node": "10 - Classificar Compatibilidade da Vaga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10 - Classificar Compatibilidade da Vaga": {
+      "main": [
+        [
+          {
+            "node": "11 - Enviar Notificações de Vaga",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "11 - Enviar Notificações de Vaga",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "02 - Configurar Perfil Profissional",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "03 B - Consultar Vagas Jobicy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 B - Consultar Vagas Jobicy": {
+      "main": [
+        [
+          {
+            "node": "04 B - Separar vagas Jobicy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 B - Separar vagas Jobicy": {
+      "main": [
+        [
+          {
+            "node": "05B - Padronizar dados da Vaga Jobicy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05B - Padronizar dados da Vaga Jobicy": {
+      "main": [
+        [
+          {
+            "node": "12 - Unificar Fontes de  Vagas",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "12 - Unificar Fontes de  Vagas": {
+      "main": [
+        [
+          {
+            "node": "08 - Avaliar Compatibilidade com IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "02 - Configurar Perfil Profissional",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "meta": {},
+  "nodeGroups": [],
+  "tags": []
+}
