@@ -1,0 +1,263 @@
+{
+  "name": "LAB 18 - Planejamento Inteligente de Estoque e  Reposição",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "LAB18_Base_Gestao_Estoque",
+          "cachedResultUrl": "REDACTED_PRIVATE_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Produtos",
+          "cachedResultUrl": "REDACTED_PRIVATE_URL"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -128
+      ],
+      "id": "395a48fd-34c9-4ce5-81fa-02a7e8a1f6b5",
+      "name": "01 - Ler Produtos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SPREADSHEET_ID",
+          "mode": "list",
+          "cachedResultName": "LAB18_Base_Gestao_Estoque",
+          "cachedResultUrl": "REDACTED_PRIVATE_URL"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 870170243,
+          "mode": "list",
+          "cachedResultName": "Vendas",
+          "cachedResultUrl": "REDACTED_PRIVATE_URL"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        64
+      ],
+      "id": "721efd6d-9f64-49ab-951e-aae609bf2f37",
+      "name": "02 - Ler Vendas",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED_CREDENTIAL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        64
+      ],
+      "id": "35d55e04-8166-4846-913b-40b2c2b12a8b",
+      "name": "00 - Iniciar Execução"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        432,
+        -16
+      ],
+      "id": "033b1332-9eae-4caf-8a82-aae9ae4bb875",
+      "name": "03 - Unificar Dados"
+    },
+    {
+      "parameters": {
+        "jsCode": "const registros = $input.all().map(item => item.json);\n\nconst produtos = registros.filter(p => p.estoque_atual !== undefined);\nconst vendas = registros.filter(v => v.venda_id !== undefined);\n\nconst diasHistorico = 30;\nconst diasSeguranca = 3;\nconst diasCobertura = 30;\n\nconst resultados = produtos.map(produto => {\n  const totalVendido = vendas\n    .filter(venda => venda.produto_id === produto.produto_id)\n    .reduce((total, venda) => total + Number(venda.quantidade || 0), 0);\n\n  const estoqueAtual = Number(produto.estoque_atual);\n  const prazoReposicao = Number(produto.prazo_reposicao_dias);\n\n  const consumoDiario = totalVendido / diasHistorico;\n  const pontoReposicao = consumoDiario * (prazoReposicao + diasSeguranca);\n  const estoqueDesejado = consumoDiario * diasCobertura;\n\n  const precisaRepor = estoqueAtual <= pontoReposicao;\n\n  const quantidadeRecomendada = precisaRepor\n    ? Math.max(0, Math.ceil(estoqueDesejado - estoqueAtual))\n    : 0;\n\n  return {\n    produto_id: produto.produto_id,\n    produto: produto.produto,\n    estoque_atual: estoqueAtual,\n    total_vendido_30_dias: totalVendido,\n    consumo_diario: Number(consumoDiario.toFixed(2)),\n    ponto_reposicao: Number(pontoReposicao.toFixed(2)),\n    precisa_repor: precisaRepor,\n    quantidade_recomendada: quantidadeRecomendada,\n    status: precisaRepor\n      ? \"REPOSICAO_NECESSARIA\"\n      : \"ESTOQUE_NORMAL\"\n  };\n});\n\nreturn resultados;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        -16
+      ],
+      "id": "c6a4b5dd-3d4d-46c7-a730-668be6348738",
+      "name": "04 - Calcular Estoque e Reposição"
+    },
+    {
+      "parameters": {
+        "jsCode": "const produtos = $input.all().map(item => item.json);\n\nconst precisamRepor = produtos.filter(\n  produto => produto.precisa_repor === true\n);\n\nconst estoqueNormal = produtos.filter(\n  produto => produto.precisa_repor === false\n);\n\nconst totalRecomendado = precisamRepor.reduce(\n  (total, produto) =>\n    total + Number(produto.quantidade_recomendada),\n  0\n);\n\nlet mensagem = \"📦 RELATÓRIO DE ESTOQUE\\n\\n\";\n\nmensagem += `Produtos analisados: ${produtos.length}\\n`;\nmensagem += `Estoque normal: ${estoqueNormal.length}\\n`;\nmensagem += `Precisam de reposição: ${precisamRepor.length}\\n\\n`;\n\nif (precisamRepor.length > 0) {\n  mensagem += \"⚠️ REPOSIÇÃO RECOMENDADA\\n\\n\";\n\n  precisamRepor.forEach(produto => {\n    mensagem += `• ${produto.produto}\\n`;\n    mensagem += `  Estoque atual: ${produto.estoque_atual}\\n`;\n    mensagem += `  Quantidade sugerida: ${produto.quantidade_recomendada} unidades\\n\\n`;\n  });\n} else {\n  mensagem += \"✅ Nenhum produto precisa de reposição.\\n\\n\";\n}\n\nmensagem += `Total recomendado: ${totalRecomendado} unidades\\n\\n`;\nmensagem += \"Atenção: recomendação sujeita à aprovação humana. Nenhuma compra foi realizada.\";\n\nreturn [\n  {\n    json: {\n      mensagem,\n      total_produtos: produtos.length,\n      produtos_para_reposicao: precisamRepor.length,\n      quantidade_total_recomendada: totalRecomendado\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -16
+      ],
+      "id": "78a65f92-7580-40d1-89f2-b9eb7dcb7a8a",
+      "name": "05 - Preparar Relatório"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        -128
+      ],
+      "id": "966ca503-a8cb-480f-82a0-4fe094ddb942",
+      "name": "00A - Agendamento de Execução"
+    },
+    {
+      "parameters": {
+        "chatId": "REDACTED_CHAT_ID",
+        "text": "={{ $json.mensagem }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        -16
+      ],
+      "id": "d61bb4d0-77ff-4300-8658-a0d72818fe2b",
+      "name": "06 - Enviar Relatório ao Responsável",
+      "webhookId": "7e05ce7a-45f5-4ac9-810a-d3b5296b7d86",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_CREDENTIAL",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "01 - Ler Produtos": {
+      "main": [
+        [
+          {
+            "node": "03 - Unificar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Ler Vendas": {
+      "main": [
+        [
+          {
+            "node": "03 - Unificar Dados",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "00 - Iniciar Execução": {
+      "main": [
+        [
+          {
+            "node": "01 - Ler Produtos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "02 - Ler Vendas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Unificar Dados": {
+      "main": [
+        [
+          {
+            "node": "04 - Calcular Estoque e Reposição",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Calcular Estoque e Reposição": {
+      "main": [
+        [
+          {
+            "node": "05 - Preparar Relatório",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "05 - Preparar Relatório": {
+      "main": [
+        [
+          {
+            "node": "06 - Enviar Relatório ao Responsável",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "00A - Agendamento de Execução": {
+      "main": [
+        [
+          {
+            "node": "01 - Ler Produtos",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "02 - Ler Vendas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "24463e5a-0fa4-4646-8d7b-ef2b04b9a563",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "REDACTED_WORKFLOW_ID",
+  "tags": []
+}
