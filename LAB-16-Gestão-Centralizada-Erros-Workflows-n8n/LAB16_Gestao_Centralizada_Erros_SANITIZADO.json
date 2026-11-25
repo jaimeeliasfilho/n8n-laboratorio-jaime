@@ -1,0 +1,103 @@
+{
+  "name": "LAB 16 - Gestão Centralizada de Erros e Falhas em Workflows",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6b16bd60-5113-41f2-bfb5-b80bc8601276",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1409ae3a-970e-463b-90b9-7b43aef5933c",
+              "name": "workflow",
+              "value": "={{ $json.workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "2582971b-3cfd-4c4c-98fb-8fc919e57d55",
+              "name": "erro",
+              "value": "={{ $json.execution.error.message }}",
+              "type": "string"
+            },
+            {
+              "id": "f8acca04-2998-4bf4-b535-b61925226b7b",
+              "name": "ultimo_no",
+              "value": "={{ $json.execution.lastNodeExecuted }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a801e6e9-4f19-4d63-8a03-d287a5f03ed3",
+      "name": "02 - Padronizar Dados do Erro"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=🚨 ALERTA DE FALHA NA AUTOMAÇÃO\n\nWorkflow: {{ $json.workflow }}\nErro: {{ $json.erro }}\nÚltimo nó executado: {{ $json.ultimo_no }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "aef50808-4819-4f2f-860f-ad180e7650cc",
+      "name": "03 - Notificar Falha no Telegram",
+      "credentials": {
+        "telegramApi": {
+          "name": "YOUR_TELEGRAM_CREDENTIAL"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "02 - Padronizar Dados do Erro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Padronizar Dados do Erro": {
+      "main": [
+        [
+          {
+            "node": "03 - Notificar Falha no Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
