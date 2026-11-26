@@ -1,0 +1,90 @@
+{
+  "name": "LAB 19 - APIs REST e Autenticação Bearer Token",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ae702a8f-1a9c-4b57-b50b-622f723c0944",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dummyjson.com/auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"username\": \"emilys\",\n  \"password\": \"SENHA_DEMO_SUBSTITUIR\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "d98f5a34-aad8-41d5-8b5d-71e4fa9480a6",
+      "name": "01 - Autenticar na API"
+    },
+    {
+      "parameters": {
+        "url": "https://dummyjson.com/auth/me",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.accessToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "874413e0-52c4-4ddc-a88a-99ac75a3759c",
+      "name": "02 - Consultar Dados Autenticados"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "01 - Autenticar na API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Autenticar na API": {
+      "main": [
+        [
+          {
+            "node": "02 - Consultar Dados Autenticados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cd97be94-3bf8-4029-88af-8ab8f184eb25",
+  "nodeGroups": [],
+  "tags": []
+}
