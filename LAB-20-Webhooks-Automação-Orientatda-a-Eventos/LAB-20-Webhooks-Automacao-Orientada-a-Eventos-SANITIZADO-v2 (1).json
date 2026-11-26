@@ -1,0 +1,147 @@
+{
+  "name": "LAB 20 - Webhooks e Automação Orientada a Eventos",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lab20-pedidos",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "72324814-b1b0-4367-8349-757a0ceed74c",
+      "name": "01 - Receber Pedido"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"sucesso\": true,\n  \"mensagem\": \"Pedido recebido com sucesso!\",\n  \"status\": \"recebido\",\n  \"origem\": \"n8n\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        480,
+        -80
+      ],
+      "id": "fa57fcb4-638e-4f43-b192-4a8929fd3eec",
+      "name": "03 - Confirmar pedido recebido"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "0b635371-4b41-44d2-80a3-38e42eb9915e",
+              "leftValue": "={{ $json.body.pedido_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "a6b4f8a6-7114-4012-b394-f7e3b2736fd5",
+              "leftValue": "={{ $json.body.produto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b819cbce-bfb5-4848-babc-0ceb8a67c86b",
+              "leftValue": "={{ $json.body.valor_total }}",
+              "rightValue": "0",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "c6d33273-6b72-4287-a9c1-7dc2cb090005",
+      "name": "02 - Validar dados do pedido"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"sucesso\": false,\n  \"mensagem\": \"Pedido rejeitado: dados obrigatórios ausentes ou inválidos.\",\n  \"status\": \"rejeitado\",\n  \"origem\": \"n8n\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        480,
+        112
+      ],
+      "id": "63be4137-795d-4fba-a8e4-a6c57543db75",
+      "name": "04 - Informar pedido inválido"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "01 - Receber Pedido": {
+      "main": [
+        [
+          {
+            "node": "02 - Validar dados do pedido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Validar dados do pedido": {
+      "main": [
+        [
+          {
+            "node": "03 - Confirmar pedido recebido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "04 - Informar pedido inválido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodeGroups": [],
+  "tags": []
+}
