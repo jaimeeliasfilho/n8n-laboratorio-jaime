@@ -1,0 +1,303 @@
+{
+  "name": "LAB 22 -  Agente de IA para Atendimento Comercial, Registro de Leads e Notificações Automáticas",
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openrouter/free",
+          "mode": "list",
+          "cachedResultName": "openrouter/free"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        208
+      ],
+      "id": "00000000-0000-4000-8000-000000000001",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SEU_CREDENTIAL_ID_OPENAI_OPENROUTER",
+          "name": "OpenAI / OpenRouter Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        128,
+        0
+      ],
+      "id": "00000000-0000-4000-8000-000000000002",
+      "name": "01 - Receber mensagem do cliente",
+      "webhookId": "00000000-0000-4000-9000-000000000001"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Você é um Agente de Atendimento Comercial de uma empresa fictícia.\n\nSua função é atender potenciais clientes com cordialidade, clareza e profissionalismo.\n\nSiga estas regras:\n\n1. Analise cuidadosamente a mensagem recebida.\n2. Identifique a necessidade ou dúvida do cliente.\n3. Responda em português brasileiro.\n4. Utilize linguagem simples, objetiva e profissional.\n5. Não invente preços, serviços, prazos ou condições comerciais.\n6. Se não possuir informações suficientes para responder, informe isso com transparência.\n7. Quando necessário, solicite informações adicionais para compreender melhor a necessidade do cliente.\n8. Não prometa ações que você não tenha capacidade de executar.\n\nSeu objetivo é proporcionar um primeiro atendimento comercial eficiente e orientar o cliente sobre o próximo passo.\n\n9. Nunca afirme que registrou um interesse, encaminhou uma solicitação ou solicitou contato de um especialista se não tiver uma ferramenta efetivamente conectada e executado essa ação.\n\nRegistro de oportunidades comerciais\n\nQuando um cliente demonstrar interesse em contratar um serviço ou solicitar um orçamento:\n\n1. Converse com o cliente para compreender sua necessidade.\n2. Solicite seu nome e endereço de e-mail antes de registrar o contato.\n3. Solicite também empresa, telefone, segmento e prazo, quando essas informações forem relevantes e ainda não tiverem sido fornecidas.\n4. Não invente nem presuma informações.\n5. Quando tiver informações suficientes, utilize a ferramenta Google Sheets para registrar o contato.\n6. Só confirme ao cliente que o registro foi realizado depois que a ferramenta executar a operação com sucesso.\n7. Se a ferramenta apresentar erro, informe que não foi possível concluir o registro.\n8. Nunca diga que enviou um e-mail ou notificou a equipe comercial enquanto essa funcionalidade não estiver conectada e executado com sucesso.\n\nSe o cliente ainda não forneceu os dados necessários, continue a conversa e faça perguntas objetivas.\n\nNotificação da equipe comercial por e-mail\n\nApós utilizar a ferramenta Google Sheets e receber a confirmação de que o novo lead foi registrado com sucesso:\n\n1. Utilize a ferramenta Gmail para enviar uma notificação ao endereço configurado.\n2. Inclua no e-mail o nome do cliente, empresa (se informada), e-mail, telefone (se informado), segmento, necessidade e prazo.\n3. Inclua um resumo objetivo da oportunidade comercial.\n4. Não invente nem complete informações ausentes.\n5. Só informe ao cliente que a equipe comercial foi notificada depois que o Gmail confirmar o envio.\n6. Se o registro no Google Sheets falhar, não envie o e-mail.\n7. Se o envio do e-mail falhar, informe que o lead foi registrado, mas que não foi possível enviar a notificação.\n\nExecute as ferramentas na ordem correta: primeiro Google Sheets, depois Gmail."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        368,
+        0
+      ],
+      "id": "00000000-0000-4000-8000-000000000003",
+      "name": "02 - Agente de Atendimento Comercial"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Registra um novo potencial cliente na planilha comercial do Google Sheets. Utilize esta ferramenta somente quando o cliente demonstrar interesse em contratar um serviço ou solicitar um orçamento e tiver fornecido os dados necessários. Acrescente uma nova linha, sem alterar registros anteriores. Nunca invente dados. Se faltarem informações, continue perguntando ao cliente antes de registrar o contato.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "SEU_GOOGLE_SHEET_ID_AQUI",
+          "mode": "list",
+          "cachedResultName": "LAB 22 - Base de Leads Comerciais",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/SEU_GOOGLE_SHEET_ID_AQUI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/SEU_GOOGLE_SHEET_ID_AQUI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID_LEAD": "={{ $now.toMillis() }}",
+            "DATA_RECEBIMENTO": "={{ $now.toISO() }}",
+            "NOME_CLIENTE": "={{ $fromAI('nome_cliente', 'Nome completo do cliente') }}",
+            "EMPRESA": "={{ $fromAI('empresa', 'Nome da empresa do cliente. Se for pessoa física ou não informar empresa, deixe vazio.') }}",
+            "E-MAIL": "={{ $fromAI('email', 'Endereço de e-mail válido do cliente para contato. Não invente. Se não informar, deixe vazio.') }}",
+            "TELEFONE": "={{ $fromAI('telefone', 'Número de telefone ou WhatsApp do cliente, incluindo DDD. Não invente. Se não informar, deixe vazio.') }}",
+            "SEGMENTO": "={{ $fromAI('segmento', 'Segmento de atuação ou ramo de atividade do cliente. Não invente. Se não informado, deixe vazio.') }}",
+            "NECESSIDADE": "={{ $fromAI('necessidade', 'Descreva o serviço, produto ou solução que o cliente procura e o problema que deseja resolver.') }}",
+            "PRAZO": "={{ $fromAI('prazo', 'Prazo ou previsão informada pelo cliente para iniciar ou receber a solução. Não invente. Se não informado, deixe vazio.') }}",
+            "STATUS": "Novo",
+            "OBSERVACOES": "={{ $fromAI('observacoes', 'Informações adicionais relevantes da conversa comercial que não estejam contempladas nos outros campos. Se não houver, deixe vazio.') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID_LEAD",
+              "displayName": "ID_LEAD",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATA_RECEBIMENTO",
+              "displayName": "DATA_RECEBIMENTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NOME_CLIENTE",
+              "displayName": "NOME_CLIENTE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EMPRESA",
+              "displayName": "EMPRESA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "E-MAIL",
+              "displayName": "E-MAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TELEFONE",
+              "displayName": "TELEFONE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SEGMENTO",
+              "displayName": "SEGMENTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NECESSIDADE",
+              "displayName": "NECESSIDADE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PRAZO",
+              "displayName": "PRAZO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "STATUS",
+              "displayName": "STATUS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "OBSERVACOES",
+              "displayName": "OBSERVACOES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        208
+      ],
+      "id": "00000000-0000-4000-8000-000000000004",
+      "name": "03 - Registro de Lead",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SEU_CREDENTIAL_ID_GOOGLE_SHEETS",
+          "name": "Google Sheets Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "equipe-comercial@example.com",
+        "subject": "Novo lead comercial registrado",
+        "message": "={{ $fromAI('corpo_email', 'Corpo do e-mail de notificação comercial, incluindo os dados disponíveis do lead e o resumo da oportunidade.') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        208
+      ],
+      "id": "00000000-0000-4000-8000-000000000005",
+      "name": "04 - Envio de e-mail para Equipe Comercial",
+      "webhookId": "00000000-0000-4000-9000-000000000002",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SEU_CREDENTIAL_ID_GMAIL",
+          "name": "Gmail Account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "02 - Agente de Atendimento Comercial",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "01 - Receber mensagem do cliente": {
+      "main": [
+        [
+          {
+            "node": "02 - Agente de Atendimento Comercial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Registro de Lead": {
+      "ai_tool": [
+        [
+          {
+            "node": "02 - Agente de Atendimento Comercial",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Envio de e-mail para Equipe Comercial": {
+      "ai_tool": [
+        [
+          {
+            "node": "02 - Agente de Atendimento Comercial",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "00000000-0000-4000-a000-000000000001",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "nodeGroups": [],
+  "id": "SEU_WORKFLOW_ID_AQUI",
+  "tags": []
+}
