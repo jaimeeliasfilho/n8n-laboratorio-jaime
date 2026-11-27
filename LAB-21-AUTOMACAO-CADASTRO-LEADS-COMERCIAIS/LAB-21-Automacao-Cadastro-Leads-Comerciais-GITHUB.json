@@ -1,0 +1,310 @@
+{
+  "name": "LAB 21 - Automação de Cadastro de Leads Comerciais",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lab21-leads-comercias",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d57a1ed0-e007-4378-b0cd-664c9c78083d",
+      "name": "01 - Receber Lead Comercial",
+      "webhookId": "7ac22203-63b5-4f51-a5ee-6affe3120930"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dbdaa444-7ce5-4ea7-a820-0475ebaff14a",
+              "name": "nome",
+              "value": "={{ $json.body.nome }}",
+              "type": "string"
+            },
+            {
+              "id": "3b05e3a8-0c51-48de-943d-1228e4dba992",
+              "name": "email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d64d8d85-c51d-4c5c-a033-cc0b807e8307",
+              "name": "telefone",
+              "value": "={{ $json.body.telefone }}",
+              "type": "string"
+            },
+            {
+              "id": "8e2b72d1-a539-4aa3-98f9-24b4be0b3729",
+              "name": "empresa",
+              "value": "={{ $json.body.empresa }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "28778884-7d12-4075-a072-3d7ee185d5a1",
+      "name": "02 - Padronizar Dados do Lead"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "413f2f3a-54ab-47d5-8074-a8273f2535b3",
+              "leftValue": "={{ $json.nome }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "da3ac833-6f2d-4759-9b8a-cb935e98f79a",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b56018be-074f-4d05-8cdb-a2e7b63bfc98",
+              "leftValue": "={{ $json.empresa }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "61ce399b-323b-437a-8596-99d1d1c8cd37",
+      "name": "03 - Validar Dados do Lead"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome": "={{ $json.nome }}",
+            "email": "={{ $json.email }}",
+            "telefone": "={{ $json.telefone }}",
+            "empresa": "={{ $json.empresa }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "empresa",
+              "displayName": "empresa",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "criado_em",
+              "displayName": "criado_em",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "89aa625b-9311-41ea-b11c-2439917e409f",
+      "name": "04 - Cadastrar Lead no PostgreSQL"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"sucesso\": true,\n  \"mensagem\": \"Lead cadastrado com sucesso!\",\n  \"status\": \"recebido\",\n  \"origem\": \"n8n\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        896,
+        -96
+      ],
+      "id": "40ec7d93-af76-43b9-8d1d-a2f333a65883",
+      "name": "05 - Confirmar cadastro de Lead"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"sucesso\": false,\n  \"mensagem\": \"Não foi possível cadastrar o lead. Verifique os campos obrigatórios.\",\n  \"status\": \"rejeitado\",\n  \"origem\": \"n8n\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        96
+      ],
+      "id": "81ae6789-5339-470e-a7ee-0595243cab52",
+      "name": "06 - Informar Dados Inválidos"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "01 - Receber Lead Comercial": {
+      "main": [
+        [
+          {
+            "node": "02 - Padronizar Dados do Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "02 - Padronizar Dados do Lead": {
+      "main": [
+        [
+          {
+            "node": "03 - Validar Dados do Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "03 - Validar Dados do Lead": {
+      "main": [
+        [
+          {
+            "node": "04 - Cadastrar Lead no PostgreSQL",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "06 - Informar Dados Inválidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "04 - Cadastrar Lead no PostgreSQL": {
+      "main": [
+        [
+          {
+            "node": "05 - Confirmar cadastro de Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}
